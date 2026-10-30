@@ -29,6 +29,7 @@
   --card:rgba(255,255,255,.72); --card-2:rgba(255,255,255,.5); --line:rgba(15,42,68,.10);
   --shadow:0 6px 24px rgba(30,70,120,.10);
   --rose:#b85a74; --rose-soft:rgba(184,90,116,.12);
+  --y0:rgba(15,42,68,.07); --y1:#cfe3f6; --y2:#94c2ec; --y3:#4f97da; --y4:#1f5fa8; --ypd:#e9b7c5;
   --f-display:"Newsreader",Georgia,"Times New Roman",serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,"Amiri",sans-serif;
   --f-ar:"Amiri","Noto Naskh Arabic","Geeza Pro",serif;
@@ -43,6 +44,7 @@
   --card:rgba(255,255,255,.07); --card-2:rgba(255,255,255,.04); --line:rgba(232,240,250,.10);
   --shadow:0 6px 24px rgba(0,0,0,.25);
   --rose:#e79ab0; --rose-soft:rgba(231,154,176,.14);
+  --y0:rgba(232,240,250,.07); --y1:#1d3b63; --y2:#2d5f98; --y3:#4f94d6; --y4:#a9d4ff; --ypd:#7c4458;
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -101,7 +103,7 @@ nav.tabs button svg{width:23px;height:23px}
 nav.tabs button[aria-current="page"]{color:var(--accent)}
 
 /* Home */
-.greet{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.greet{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .greet .date{font-family:var(--f-display);font-size:17px;color:var(--ink-2);margin-top:4px}
 .iconbtn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);flex:none}
 .iconbtn svg{width:22px;height:22px}
@@ -147,6 +149,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent)}
 .hz{display:block;width:100%;height:auto}
 :root[data-sky="night"] .hz{filter:invert(.93)}
 .hzpage{font-size:12px;color:var(--muted);text-align:center;letter-spacing:.08em;margin:6px 0 2px}
+.hzpg{display:block}.hzpg.is-done{opacity:.5}.dhikr.is-done{opacity:.7}
 .hzday{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
 .hzday button{flex:none;padding:7px 12px;border-radius:999px;font-weight:600;font-size:13px;background:var(--card-2);border:1px solid var(--line);color:var(--muted)}
 .hzday button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -169,6 +172,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent)}
 .stats4 span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .titem{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;width:100%}
 .titem .name{font-family:var(--f-display);font-size:22px;font-weight:600}
+.tar{font-family:var(--f-ar);font-size:18px;line-height:1.9;font-weight:400;display:block;text-align:center}
 .counter{position:fixed;inset:0;z-index:40;background:linear-gradient(180deg,var(--sky-1),var(--sky-3));display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(16px,env(safe-area-inset-left,0px))}
 .counter .ring{flex:1;display:grid;place-items:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .counter .beads{width:min(84vw,360px);aspect-ratio:1;position:relative;max-width:100%}
@@ -182,6 +186,17 @@ nav.tabs button[aria-current="page"]{color:var(--accent)}
 .field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
 .field input,.field textarea{font:inherit;font-weight:400;padding:11px 13px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);transform:translateX(-50%);background:var(--ink);color:var(--sky-3);padding:10px 16px;border-radius:99px;font-size:14px;font-weight:600;z-index:60;box-shadow:var(--shadow)}
+.yg{display:grid;grid-template-columns:22px repeat(12,1fr);gap:3px;align-items:center}
+.yg .mh{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;padding-bottom:3px}
+.yg .dn{font-size:10px;color:var(--muted);text-align:right;padding-right:3px;font-variant-numeric:tabular-nums}
+.ypx{aspect-ratio:1;border-radius:4px;background:var(--y0);width:100%;max-width:100%;display:block}
+.ypx.f{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
+.ypx.x{visibility:hidden}.ypx.p{background:var(--ypd)}.ypx.t{box-shadow:0 0 0 2px var(--accent)}.ypx.sel{outline:2px solid var(--gold);outline-offset:1px}
+.ypx.l1{background:var(--y1)}.ypx.l2{background:var(--y2)}.ypx.l3{background:var(--y3)}.ypx.l4{background:var(--y4)}
+.ylegend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px;color:var(--ink-2);align-items:center}
+.ylegend i{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.yrows{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px}
+.yrows .ok{color:var(--done);font-weight:600}.yrows .no{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -208,9 +223,12 @@ const SALAH=[
 const DEFAULT_TASBIH=[
  {id:'k1',name:'1st Kalimah',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَّسُوْلُ اللّٰهِ',target:300},
  {id:'k3',name:'3rd Kalimah',ar:'سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ',target:300},
- {id:'ist',name:'Istighfar',ar:'',target:300},
- {id:'dur',name:'Durood',ar:'',target:1000},
+ {id:'ist',name:'Istighfar',ar:'استغفار',target:300},
+ {id:'dur',name:'Durood',ar:'درود',target:1000},
+ {id:'sbh',name:'SubhanAllahi wa bihamdihi',ar:'سُبْحَانَ اللّٰهِ وَبِحَمْدِهٖ',target:200},
+ {id:'tah',name:'La ilaha illallah wahdahu',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهٗ لَا شَرِيْكَ لَهٗ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ',target:200},
 ];
+const tName=x=>x.ar?`<span class="tar" lang="ar" dir="rtl">${esc(x.ar)}</span>`:esc(x.name);
 const ICON={
  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>',
  hadith:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5c3-1 6-1 8 1v14c-2-2-5-2-8-1z"/><path d="M20 5c-3-1-6-1-8 1v14c2-2 5-2 8-1z"/></svg>',
@@ -239,7 +257,9 @@ let S;
 function fresh(){return{v:1,hadith:{},quran:{pages:{},khatam:0},salah:{},periods:[],adhkar:{},tasbih:{items:DEFAULT_TASBIH.map(x=>({...x})),counts:{}},hijri:null,theme:'auto',created:todayKey()}}
 function load(){try{const raw=localStorage.getItem(STORE);S=raw?JSON.parse(raw):fresh()}catch(e){S=fresh()}
   const f=fresh();for(const k in f) if(S[k]===undefined) S[k]=f[k];
-  if(!S.hijri) S.hijri=initHijri();}
+  if(!S.hijri) S.hijri=initHijri();
+  for(const d of DEFAULT_TASBIH){const it=S.tasbih.items.find(i=>i.id===d.id);if(!it)S.tasbih.items.push({...d});else it.ar=d.ar}
+  if(!S.quran.log) S.quran.log={};}
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){toast('Could not save. Phone storage may be full.')}},150)}
 function persistNow(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
@@ -348,8 +368,12 @@ function quranStatus(){
   return{read,exp,target,todayNeed,first,diff:read<due?read-due:Math.max(0,read-target)};
 }
 function todayBlock(qs){const t=todayKey();const b=S.quran.today;
-  if(!b||b.k!==t){S.quran.today={k:t,from:qs.first,n:Math.max(1,qs.todayNeed)};save()}
+  if(t<START){const n=Math.max(1,Math.ceil(quranExpected(START)-1e-9));return{k:t,from:1,n,pre:true}}
+  if(!b||b.k!==t){S.quran.today={k:t,from:qs.first,n:Math.max(1,qs.todayNeed)};if(!isPeriod(t)){S.quran.log=S.quran.log||{};S.quran.log[t]=S.quran.today.n}save()}
   return S.quran.today;}
+function quranToday(){const qs=quranStatus(),tb=todayBlock(qs);const to=Math.min(QURAN_PAGES,tb.from+tb.n-1);
+  let done=0;for(let k=tb.from;k<=to;k++)if(S.quran.pages[k])done++;
+  return{qs,tb,from:tb.from,to,n:to-tb.from+1,done,range:tb.from===to?`page ${tb.from}`:`pages ${tb.from}–${to}`}}
 function adhkarDay(k){return S.adhkar[k]||(S.adhkar[k]={m:{},e:{},z:false})}
 function adhkarDone(k,which){if(!ADHKAR)return false;const d=S.adhkar[k];if(!d)return false;const list=ADHKAR[which==='m'?'morning':'evening'];return list.every((x,i)=>(d[which][i]||0)>=x.n)}
 function salahDay(k){return S.salah[k]||(S.salah[k]={})}
@@ -372,7 +396,7 @@ function ring(frac,size=44,stroke=5,color='var(--accent)'){const r=(size-stroke)
 function statusPill(diff,unit){if(diff>=0)return `<span class="status ok">${diff>0?diff+' '+unit+' ahead':'On track'}</span>`;return `<span class="status behind">${-diff} ${unit} behind</span>`}
 
 /* ---------- router ---------- */
-const TABS=[['home','Home'],['hadith','Hadith'],['quran','Quran'],['salah','Salah'],['adhkar','Adhkar'],['tasbih','Tasbih']];
+const TABS=[['home','Home'],['salah','Salah'],['adhkar','Adhkar'],['quran','Quran'],['hadith','Hadith'],['tasbih','Tasbih']];
 let tab='home';const ui={hDay:null,hMode:'day',adhkar:null,salahDay:null,qPage:null};
 function setTab(t){tab=t;ui.hDay=null;ui.salahDay=null;scrollTo(0,0);render();try{history.replaceState(null,'','#'+t)}catch(e){}}
 function renderTabs(){document.getElementById('tabbar').innerHTML=TABS.map(([id,l])=>`<button data-act="tab" data-v="${id}" ${tab===id?'aria-current="page"':''}>${ICON[id]}<span>${l}</span></button>`).join('')}
@@ -396,13 +420,13 @@ async function viewHome(){
     <div class="prayers">${SALAH.map(p=>`<button data-act="fard" data-v="${p.id}" class="${sd[p.id+'.f']?'on':''}" aria-pressed="${!!sd[p.id+'.f']}"><span class="dot"></span>${p.name}</button>`).join('')}</div></div>`;
   const hFrac=hs.todayTotal?hs.todayRead/hs.todayTotal:0;
   const qPaused=isPeriod(t);
-  const qFrac=qs.todayNeed===0?1:0;
+  const QT=quranToday();const qFrac=QT.n?QT.done/QT.n:0;
   const mDone=adhkarDone(t,'m'),eDone=adhkarDone(t,'e'),zDone=(S.adhkar[t]||{}).z,hDone=(S.adhkar[t]||{}).hz;
   const tt=tasbihToday(t);
   const week=[...Array(7)].map((_,i)=>{const k=addDays(t,i-6),sc=dayScore(k);
     return `<div class="d ${k===t?'today':''}">${sc===null?`<svg width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="16" fill="var(--rose-soft)"/></svg>`:ring(sc,38,4,'var(--done)')}<span>${fmtDate(k,{weekday:'narrow'})}</span></div>`}).join('');
   return `<section class="view">
-  <div class="greet"><div><h1>Assalamu Alaikum</h1><div class="date">${hijriText(t)}</div><div class="small muted">${fmtDate(t,{weekday:'long',day:'numeric',month:'long'})}</div></div>
+  <div class="greet"><div><div class="date" style="margin-top:0">${hijriText(t)}</div><div class="small muted">${fmtDate(t,{weekday:'long',day:'numeric',month:'long'})}</div></div>
     <button class="iconbtn" data-act="settings" aria-label="Settings">${ICON.gear}</button></div>
   ${mq?`<div class="card"><div class="row" style="gap:12px">${ICON.moon.replace('<svg','<svg width="28" height="28"')}<div style="flex:1"><b>Was the ${mq.next} moon sighted tonight?</b><div class="small muted">Answer once your masjid announces.</div></div></div>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="moon" data-v="1">Yes, sighted</button><button class="btn ghost" data-act="moon" data-v="0">No, 30 days</button></div></div>`:''}
@@ -415,14 +439,15 @@ async function viewHome(){
       <div class="big tnum">${hs.todayRead}<span class="muted" style="font-size:18px">/${hs.todayTotal}</span></div>
       <div class="sub">${pd<0?`Starts ${fmtDate(START)}`:`Day ${Math.min(pd+1,365)} of 365`}</div>${pd>=0?statusPill(hs.diff,'hadith'):''}</button>
     <button class="card plan" data-act="tab" data-v="quran"><div class="row between"><span class="eyebrow">Quran</span>${qPaused?'':ring(qFrac,36,4)}</div>
-      <div class="big tnum">${qs.read}<span class="muted" style="font-size:18px">/604</span></div>
-      <div class="sub">${qPaused?'Paused (period days)':(t<START?`Starts ${fmtDate(START)}`:(qs.todayNeed?`${qs.todayNeed} page${qs.todayNeed>1?'s':''} today`:'Done for today'))}</div>${t>=START&&!qPaused?statusPill(qs.diff,'pages'):''}</button>
+      <div class="big tnum">${QT.done}<span class="muted" style="font-size:18px">/${QT.n}</span></div>
+      <div class="sub">${qPaused?'Paused (period days)':(QT.tb.pre?`Starts ${fmtDate(START)}: ${QT.range}`:`Today: ${QT.range}`)}</div>${t>=START&&!qPaused?statusPill(qs.diff,'pages'):''}</button>
     <button class="card plan" data-act="tab" data-v="adhkar"><span class="eyebrow">Adhkar</span>
       <div class="row" style="gap:8px;flex-wrap:wrap">${[['Morning',mDone],['Evening',eDone],['Manzil',zDone],['Hizb',hDone]].map(([l,d])=>`<span class="status ${d?'ok':''}">${d?'✓ ':''}${l}</span>`).join('')}</div></button>
     <button class="card plan" data-act="tab" data-v="tasbih"><span class="eyebrow">Tasbih</span>
       <div class="big tnum">${tt.toLocaleString()}</div><div class="sub">counted today</div></button>
   </div>
-  <div class="card"><div class="row between" style="margin-bottom:12px"><span class="eyebrow">Last 7 days</span><span class="small muted">Fard salah + adhkar</span></div><div class="week">${week}</div></div>
+  <div class="card"><div class="row between" style="margin-bottom:12px"><span class="eyebrow">Last 7 days</span><span class="small muted">Fard salah + adhkar</span></div><div class="week">${week}</div>
+    <button class="btn ghost" data-act="year" style="width:100%;margin-top:14px">View your year</button></div>
   </section>`;
 }
 
@@ -468,13 +493,16 @@ async function viewQuran(){
   if(isPeriod(t)) return `<section class="view"><div class="card paused"><div class="eyebrow">Quran</div><h2 style="margin:8px 0">Paused for period days</h2><p class="muted">Your daily target is on hold and will re-spread across the remaining days, so you still finish by 31 October.</p><button class="btn ghost" data-act="tab" data-v="home">Back to Home</button></div></section>`;
   const Q=await quran(),qs=quranStatus();
   if(qs.read>=QURAN_PAGES) return `<section class="view"><div class="card paused"><div class="eyebrow">Khatam</div><h2 style="margin:8px 0">You've completed the Quran${S.quran.khatam?` (${S.quran.khatam+1})`:''}</h2><p class="muted">May Allah accept it from you.</p><button class="btn" data-act="newkhatam">Start a new khatam</button></div></section>`;
-  const tb=todayBlock(qs);let pages=[];
-  if(ui.qPage===null){for(let k=tb.from;k<tb.from+tb.n&&k<=QURAN_PAGES;k++)pages.push(k);
-    if(pages.every(k=>S.quran.pages[k])){let k=qs.first;pages=k<=QURAN_PAGES?[k]:[]}}
+  const QT=quranToday(),tb=QT.tb;let pages=[];
+  if(ui.qPage===null){for(let k=QT.from;k<=QT.to;k++)pages.push(k);
+    if(pages.every(k=>S.quran.pages[k])&&!tb.pre){let k=qs.first;pages=k<=QURAN_PAGES?[k]:[]}}
   else pages=[ui.qPage];
   const p=pages[0]||qs.first;
+  const allDone=QT.done>=QT.n;
   return `<section class="view">
-   <div class="card"><div class="row between"><div><span class="eyebrow">Quran plan</span><div style="font-weight:600;margin-top:2px">${t<START?`Starts ${fmtDate(START)}`:(qs.todayNeed?`Today: ${qs.todayNeed} page${qs.todayNeed>1?'s':''}`:'Done for today. Read on if you like')}</div></div>${t>=START?statusPill(qs.diff,'pages'):''}</div>
+   <div class="card"><div class="row between" style="align-items:flex-start"><div><span class="eyebrow">${tb.pre?`Starts ${fmtDate(START,{weekday:'long'})}`:'Today'}</span>
+      <div style="font-family:var(--f-display);font-size:24px;font-weight:600;line-height:1.2;margin-top:2px">${QT.range.charAt(0).toUpperCase()+QT.range.slice(1)}</div>
+      <div class="small muted">${allDone&&!tb.pre?'Done for today, alhamdulillah. Read on if you like':`${QT.done} of ${QT.n} done`} · about 2–3 pages a day</div></div>${tb.pre?'':statusPill(qs.diff,'pages')}</div>
     <div class="progress" style="margin-top:12px"><i style="width:${qs.read/604*100}%"></i></div>
     <div class="row between small muted" style="margin-top:6px"><span>${qs.read} of 604 pages</span><span>Ends 31 Oct 2027</span></div></div>
    <div class="daynav"><button class="iconbtn" data-act="qpage" data-v="-1" aria-label="Previous page" ${p<=1?'disabled':''}>${ICON.left}</button>
@@ -521,24 +549,34 @@ async function viewAdhkar(){
   const seg=`<div class="seg" role="group" aria-label="Adhkar set">${[['m','Morning'],['e','Evening'],['z','Manzil'],['h','Hizb']].map(([v,l])=>`<button data-act="aset" data-v="${v}" aria-pressed="${w===v}">${l}</button>`).join('')}</div>`;
   if(w==='h'){
     const today=WDAY[new Date().getDay()];if(!ui.hz)ui.hz=today;const k=ui.hz;
-    const lines=await hizbDay(k);let html='',lastP=null;
-    for(const x of lines){if(x.p!==lastP){html+=`<div class="hzpage">PAGE ${x.p}</div>`;lastP=x.p}
-      html+=`<img class="hz" src="${x.u}" width="${HZI.w}" height="${x.h}" loading="lazy" decoding="async" alt="">`}
+    const lines=await hizbDay(k);const isToday=k===today;d.hzp=d.hzp||{};
+    const byP=[];for(const x of lines){let g=byP[byP.length-1];if(!g||g.p!==x.p){g={p:x.p,l:[]};byP.push(g)}g.l.push(x)}
+    const hn=byP.filter(g=>d.hzp[g.p]).length;
+    let html=byP.map(g=>{const on=isToday&&!!d.hzp[g.p];
+      return `<div class="card hzpg ${on?'is-done':''}" ${isToday?`role="button" tabindex="0" data-act="hzpage" data-v="${g.p}"`:''} style="padding:10px 10px 12px">
+        <div class="row between" style="padding:0 6px 4px"><span class="hzpage" style="margin:0">PAGE ${g.p}</span>${isToday?`<span class="count" style="font-family:var(--f-display);font-weight:600;color:var(--done)">${on?'✓':''}</span>`:''}</div>
+        ${g.l.map(x=>`<img class="hz" src="${x.u}" width="${HZI.w}" height="${x.h}" loading="lazy" decoding="async" alt="">`).join('')}</div>`}).join('');
+    S._hzpages=byP.map(g=>g.p);
     const order=['sat','sun','mon','tue','wed','thu','fri'];
     return `<section class="view">${seg}
      <div class="card"><div class="row between"><div><span class="eyebrow">Hizbul Azam</span><div style="font-weight:600;margin-top:2px">${WNAME[k]}${k===today?' · today':''}</div></div>${k===today?`<span class="status ${d.hz?'ok':''}">${d.hz?'✓ Read':'Not yet'}</span>`:''}</div>
      <div class="hzday" style="margin-top:12px">${order.map(x=>`<button data-act="hzday" data-v="${x}" aria-pressed="${x===k}">${WNAME[x].slice(0,3)}${x===today?' •':''}</button>`).join('')}</div>
-     <p class="small muted" style="margin:10px 0 0">Ta'limi Board (KZN) edition. Page numbers match the printed book.</p></div>
-     <div class="card" style="padding:12px 10px">${html}</div>
-     ${k===today?`<button class="btn ${d.hz?'ghost':''}" data-act="hizb">${d.hz?'✓ Hizbul Azam read today':'Mark Hizbul Azam read'}</button>`:`<button class="btn ghost" data-act="hzday" data-v="${today}">Go to today's part</button>`}
+     <p class="small muted" style="margin:10px 0 0">Ta'limi Board (KZN) edition. Page numbers match the printed book.${isToday?' Tap each page when you\'ve read it.':''}</p>
+     ${isToday?`<div class="row between" style="margin-top:10px"><b class="tnum" id="hzcount">${hn} of ${byP.length} pages</b><button class="btn ghost small" data-act="hizb">${d.hz?'Clear':'Mark all read'}</button></div>`:''}</div>
+     ${html}
+     ${isToday?'':`<button class="btn ghost" data-act="hzday" data-v="${today}">Go to today's part</button>`}
     </section>`;
   }
   if(w==='z'){
     const Q=await quran();if(!MANZIL)MANZIL=await getJSON('manzil.json');
-    let html='';for(const [s,a,b] of MANZIL){html+=`<div class="card"><div class="ref" style="text-align:center;margin-bottom:6px">${esc(Q.suras[s][1])} ${s}:${a}${b>a?'–'+b:''}</div>`;
+    d.zp=d.zp||{};const zn=MANZIL.filter((_,i)=>d.zp[i]).length;
+    let html='';MANZIL.forEach(([s,a,b],i)=>{const on=!!d.zp[i];html+=`<div class="card dhikr ${on?'is-done':''}" role="button" tabindex="0" data-act="zpart" data-v="${i}"><div class="row between"><span class="ref">${esc(Q.suras[s][1])} ${s}:${a}${b>a?'–'+b:''}</span><span class="count">${on?'✓':''}</span></div>`;
       if(a===1&&s!==1&&s!==9) html+=`<div class="bism">${esc(stripNum(Q.ayahs[0][4]))}</div>`;
-      html+=`<p class="q" style="margin:0">${[...Array(b-a+1)].map((_,i)=>esc(Q.bySA[s+':'+(a+i)][4])).join(' ')}</p></div>`}
-    return `<section class="view">${seg}${html}<button class="btn ${d.z?'ghost':''}" data-act="manzil">${d.z?'✓ Manzil read today':'Mark Manzil read'}</button></section>`;
+      html+=`<p class="q" style="margin:0">${[...Array(b-a+1)].map((_,j)=>esc(Q.bySA[s+':'+(a+j)][4])).join(' ')}</p></div>`});
+    return `<section class="view">${seg}
+     <p class="small muted" style="margin:0;text-align:center">Tap each passage when you've read it.</p>
+     <div class="card row between"><div><b class="tnum" id="zcount">${zn} of ${MANZIL.length}</b> <span class="muted">read</span></div><button class="btn ghost small" data-act="manzil">${d.z?'Clear':'Mark all read'}</button></div>
+     ${html}</section>`;
   }
   const list=ADHKAR[w==='m'?'morning':'evening'];const Q=list.some(x=>x.q)?await quran():null;await lwa();
   const doneN=list.filter((x,i)=>(d[w][i]||0)>=x.n).length;
@@ -553,6 +591,53 @@ async function viewAdhkar(){
   </section>`;
 }
 
+/* ---------- YEAR VIEW ---------- */
+const YCATS=[['all','Everything'],['salah','Salah'],['quran','Quran'],['hadith','Hadith'],['adhkar','Adhkar']];
+function yearDay(k){
+  const per=isPeriod(k),i=diffDays(START,k),plan=META.plan[i]||[];
+  const qTick=Object.values(S.quran.pages).filter(d=>d===k).length,qTarget=(S.quran.log||{})[k]||2;
+  const a=S.adhkar[k]||{};const parts=[adhkarDone(k,'m'),adhkarDone(k,'e'),!!a.z,!!a.hz];
+  const tas=S.tasbih.items.every(x=>((S.tasbih.counts[x.id]||{})[k]||0)>=x.target);
+  return{per,fard:fardCount(k),q:Math.min(1,qTick/qTarget),qTick,h:plan.length?plan.filter(n=>S.hadith[n]).length/plan.length:0,hN:plan.filter(n=>S.hadith[n]).length,hT:plan.length,
+    m:parts[0],e:parts[1],z:parts[2],hz:parts[3],ad:parts.filter(Boolean).length/4,tas,tah:!!(S.salah[k]||{}).tahajjud};
+}
+function yScore(d,c){if(d.per&&(c==='salah'||c==='quran'))return 'p';
+  const v={salah:d.fard/5,quran:d.q,hadith:d.h,adhkar:d.ad};
+  if(c==='all'){const ks=d.per?['hadith','adhkar']:['salah','quran','hadith','adhkar'];return ks.reduce((a,x)=>a+v[x],0)/ks.length}
+  return v[c]}
+const yLvl=s=>s==='p'?'p':s<=0?'':s<.34?'l1':s<.67?'l2':s<1?'l3':'l4';
+async function viewYear(){
+  await meta();if(!ADHKAR)ADHKAR=await getJSON('adhkar.json');
+  const t=todayKey(),c=ui.ycat||'all';const last=t<END?t:END;
+  if(!ui.ysel||ui.ysel>last||ui.ysel<START)ui.ysel=t<START?null:last;
+  const months=[...Array(12)].map((_,i)=>{const d=parseKey(START);d.setMonth(d.getMonth()+i);return d});
+  let g='<span></span>'+months.map(m=>`<span class="mh">${m.toLocaleDateString('en-GB',{month:'narrow'})}</span>`).join('');
+  const days={};
+  for(let day=1;day<=31;day++){g+=`<span class="dn">${day}</span>`;
+    for(const m of months){const d=new Date(m.getFullYear(),m.getMonth(),day,12);
+      if(d.getMonth()!==m.getMonth()){g+='<span class="ypx x"></span>';continue}
+      const k=keyOf(d);if(k>last){g+='<span class="ypx f"></span>';continue}
+      const yd=days[k]=yearDay(k);
+      g+=`<button class="ypx ${yLvl(yScore(yd,c))} ${k===t?'t':''} ${k===ui.ysel?'sel':''}" data-act="ysel" data-v="${k}" aria-label="${fmtDate(k,{weekday:'long',day:'numeric',month:'long'})}"></button>`}}
+  const ks=Object.keys(days).sort();let full=0,best=0,cur=0;
+  for(const k of ks){const f=yScore(days[k],'all')>=1;if(f)full++;if(f||days[k].per){cur++;best=Math.max(best,cur)}else cur=0}
+  const hadRead=Object.keys(S.hadith).length,pages=Object.keys(S.quran.pages).length;
+  let detail='';
+  if(ui.ysel&&days[ui.ysel]){const d=days[ui.ysel];const y=(b,txt,f)=>`<span>${txt}</span><span class="${b?'ok':'no'}">${b?'✓ '+(f||'Done'):(f||'Not done')}</span>`;
+    detail=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>${fmtDate(ui.ysel,{weekday:'long',day:'numeric',month:'long'})}</h3><div class="small muted" style="margin-top:-6px">${hijriText(ui.ysel)}</div>
+      <div class="yrows">${d.per?`<span>Salah · Quran</span><span class="no">Period day</span>`:y(d.fard===5,'Fard salah',d.fard+'/5')+y(d.q>=1,'Quran',d.qTick+' page'+(d.qTick===1?'':'s'))+y(d.tah,'Tahajjud')}
+      ${y(d.hT&&d.hN===d.hT,'Hadith',d.hN+'/'+d.hT)}${y(d.m,'Morning adhkar')}${y(d.e,'Evening adhkar')}${y(d.z,'Manzil')}${y(d.hz,'Hizbul Azam')}${y(d.tas,'All tasbih targets')}</div></div>`}
+  return `<section class="view">
+   <div class="daynav"><button class="iconbtn" data-act="tab" data-v="home" aria-label="Back">${ICON.left}</button><div style="text-align:center"><h2>Year View</h2><div class="small muted">1 Nov 2026 – 31 Oct 2027</div></div><span style="width:40px"></span></div>
+   <div class="card stats4"><div><span>Full days</span><b class="tnum">${full}</b></div><div><span>Streak</span><b class="tnum">${best}</b></div><div><span>Hadith</span><b class="tnum">${hadRead.toLocaleString()}</b></div><div><span>Pages</span><b class="tnum">${pages}</b></div></div>
+   ${t<START?`<div class="banner">Your year starts on ${fmtDate(START,{weekday:'long',day:'numeric',month:'long'})}. Each day's square fills in from what you tick.</div>`:''}
+   <div class="hzday">${YCATS.map(([v,l])=>`<button data-act="ycat" data-v="${v}" aria-pressed="${c===v}">${l}</button>`).join('')}</div>
+   <div class="card" style="padding:12px"><div class="yg">${g}</div></div>
+   <div class="ylegend"><span>Less <i class="ypx" style="width:13px;display:inline-block"></i><i class="ypx l1" style="width:13px;display:inline-block"></i><i class="ypx l2" style="width:13px;display:inline-block"></i><i class="ypx l3" style="width:13px;display:inline-block"></i><i class="ypx l4" style="width:13px;display:inline-block"></i> All done</span><span><i style="background:var(--ypd)"></i>Period day</span><span><i style="box-shadow:inset 0 0 0 1px var(--line)"></i>Still to come</span></div>
+   ${detail}
+  </section>`;
+}
+
 /* ---------- TASBIH ---------- */
 function tasbihSum(id,from,to){const c=S.tasbih.counts[id]||{};let s=0;for(const k in c) if((!from||k>=from)&&(!to||k<=to)) s+=c[k];return s}
 async function viewTasbih(){
@@ -561,8 +646,7 @@ async function viewTasbih(){
   return `<section class="view"><div style="text-align:center"><h1>Tasbih</h1></div>
    <div class="card stats4"><div><span>Today</span><b class="tnum">${all(t).toLocaleString()}</b></div><div><span>Month</span><b class="tnum">${all(mon).toLocaleString()}</b></div><div><span>Year</span><b class="tnum">${all(yr).toLocaleString()}</b></div><div><span>Lifetime</span><b class="tnum">${all().toLocaleString()}</b></div></div>
    ${S.tasbih.items.map(x=>{const c=(S.tasbih.counts[x.id]||{})[t]||0;return `<button class="card titem" data-act="tcount" data-v="${x.id}">
-     ${x.ar?`<div class="ar" style="text-align:center;font-size:24px;color:var(--gold)" lang="ar">${esc(x.ar)}</div>`:''}
-     <div class="name">${esc(x.name)}</div>
+     <div class="name">${tName(x)}</div>
      <div class="progress" style="width:100%;margin-top:4px"><i style="width:${Math.min(100,c/x.target*100)}%;background:${c>=x.target?'var(--done)':'var(--accent)'}"></i></div>
      <div class="row between small" style="width:100%"><span class="muted">Target ×${x.target.toLocaleString()}</span><b class="tnum" style="color:${c>=x.target?'var(--done)':'var(--gold)'}">Today · ${c.toLocaleString()}</b></div></button>`}).join('')}
    <button class="btn ghost" data-act="tadd">+ Add your own</button></section>`;
@@ -574,8 +658,8 @@ function drawCounter(){const x=S.tasbih.items.find(i=>i.id===counterId);if(!x){d
   const beads=[...Array(N)].map((_,i)=>{const a=(-90+i*360/N)*Math.PI/180,bx=180+R*Math.cos(a),by=180+R*Math.sin(a),on=i<act||(c>0&&act===0);
     return `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${i===act?12:10}" fill="${i===act?'var(--sky-3)':(on?'var(--accent)':'var(--card)')}" stroke="${i===act?'var(--gold)':'var(--line)'}" stroke-width="${i===act?3:1.5}"/>`}).join('');
   document.getElementById('overlay').innerHTML=`<div class="counter" role="dialog" aria-label="${esc(x.name)} counter">
-   <div class="row between"><button class="iconbtn" data-act="tclose" aria-label="Back">${ICON.left}</button><div style="text-align:center"><h2>${esc(x.name)}</h2><div class="small muted">Target ×${x.target.toLocaleString()}</div></div><div class="row" style="gap:6px"><button class="btn ghost small" data-act="tadd1">+ Add</button><button class="btn ghost small" data-act="tundo">−1</button></div></div>
-   ${x.ar?`<div class="ar" style="text-align:center;font-size:24px;color:var(--gold);margin-top:8px" lang="ar">${esc(x.ar)}</div>`:''}
+   <div class="row between"><button class="iconbtn" data-act="tclose" aria-label="Back">${ICON.left}</button><div class="small muted" style="text-align:center;flex:1">Target ×${x.target.toLocaleString()}</div><div class="row" style="gap:6px"><button class="btn ghost small" data-act="tadd1">+ Add</button><button class="btn ghost small" data-act="tundo">−1</button></div></div>
+   <div style="margin-top:10px">${x.ar?tName(x):`<h2 style="text-align:center">${esc(x.name)}</h2>`}</div>
    <div class="ring" data-act="tinc"><div class="beads"><svg viewBox="0 0 360 360" aria-hidden="true"><circle cx="180" cy="180" r="${R}" fill="none" stroke="var(--line)" stroke-width="2"/>${beads}</svg>
      <div class="num"><div><b class="tnum">${c.toLocaleString()}</b><span class="muted tnum">/ ${x.target.toLocaleString()}</span>${c>=x.target?'<div class="status ok" style="margin-top:8px">Target reached</div>':''}</div></div></div></div>
    <p class="small muted" style="text-align:center;margin:0">Tap anywhere on the beads to count. Keeps counting past the target.</p>
@@ -646,14 +730,26 @@ document.addEventListener('click',async e=>{
        if(dn===list.length)toast(w==='m'?'Morning adhkar complete':'Evening adhkar complete');}
      break}
    case 'areset':{const d=adhkarDay(t);d[ui.adhkar]={};save();render();break}
+   case 'year':setTab('year');break;
+   case 'ycat':ui.ycat=v;render();break;
+   case 'ysel':ui.ysel=v;await render();document.querySelector('.yrows')?.closest('.card').scrollIntoView({behavior:'smooth',block:'nearest'});break;
    case 'hzday':ui.hz=v;scrollTo(0,0);render();break;
-   case 'hizb':{const d=adhkarDay(t);d.hz=!d.hz;save();render();break}
-   case 'manzil':{const d=adhkarDay(t);d.z=!d.z;save();render();break}
+   case 'hizb':{const d=adhkarDay(t);d.hz=!d.hz;d.hzp={};if(d.hz)for(const p of (S._hzpages||[]))d.hzp[p]=1;save();render();break}
+   case 'manzil':{const d=adhkarDay(t);d.z=!d.z;d.zp={};if(d.z)MANZIL.forEach((_,i)=>d.zp[i]=1);save();render();break}
+   case 'zpart':{const d=adhkarDay(t);d.zp=d.zp||{};if(d.zp[v])delete d.zp[v];else d.zp[v]=1;const on=!!d.zp[v];
+     el.classList.toggle('is-done',on);el.querySelector('.count').textContent=on?'✓':'';buzz(on?15:8);
+     const n=MANZIL.filter((_,i)=>d.zp[i]).length;d.z=n===MANZIL.length;save();const zc=document.getElementById('zcount');if(zc)zc.textContent=`${n} of ${MANZIL.length}`;
+     if(d.z){toast('Manzil complete');render()}else if(on){const nx=el.nextElementSibling;if(nx)setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),200)}break}
+   case 'hzpage':{const d=adhkarDay(t);d.hzp=d.hzp||{};if(d.hzp[v])delete d.hzp[v];else d.hzp[v]=1;const on=!!d.hzp[v];
+     el.classList.toggle('is-done',on);el.querySelector('.count').textContent=on?'✓':'';buzz(on?15:8);
+     const all=S._hzpages||[];const n=all.filter(p=>d.hzp[p]).length;d.hz=all.length>0&&n===all.length;save();
+     const hc=document.getElementById('hzcount');if(hc)hc.textContent=`${n} of ${all.length} pages`;
+     if(d.hz){toast('Hizbul Azam complete');render()}else if(on){const nx=el.nextElementSibling;if(nx&&nx.classList.contains('hzpg'))setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),200)}break}
    case 'tcount':openCounter(v);break;
    case 'tinc':countTasbih(1);break;
    case 'tundo':countTasbih(-1);break;
    case 'tadd1':{const x=S.tasbih.items.find(i=>i.id===counterId);const box=document.createElement('div');box.className='sheet';box.dataset.act='tcancel';
-     box.innerHTML=`<div class="panel"><h2>Add to ${esc(x.name)}</h2><p class="small muted" style="margin:0">For counts you did on a physical tasbih. Adds to today.</p>
+     box.innerHTML=`<div class="panel"><h2>Add</h2>${x.ar?tName(x):''}<p class="small muted" style="margin:0">For counts you did on a physical tasbih. Adds to today.</p>
        <div class="field"><label for="tn2">How many?</label><input id="tn2" type="number" inputmode="numeric" min="1" placeholder="e.g. 500"></div>
        <div class="row"><button class="btn" data-act="taddsave">Add</button><button class="btn ghost" data-act="tcancel">Cancel</button></div></div>`;
      document.getElementById('overlay').appendChild(box);setTimeout(()=>document.getElementById('tn2')?.focus(),50);break}
@@ -677,7 +773,7 @@ async function updateHadithHead(){const m=await meta();const list=m.plan[ui.hDay
   const c=document.getElementById('hcount'),b=document.getElementById('hbar');if(c)c.textContent=`${r} of ${list.length}`;if(b)b.style.width=(r/list.length*100)+'%';}
 
 /* ---------- boot ---------- */
-const VIEWS={home:viewHome,hadith:viewHadith,quran:viewQuran,salah:viewSalah,adhkar:viewAdhkar,tasbih:viewTasbih};
+const VIEWS={home:viewHome,hadith:viewHadith,quran:viewQuran,salah:viewSalah,adhkar:viewAdhkar,tasbih:viewTasbih,year:viewYear};
 load();applySky();
 const h=location.hash.slice(1);if(VIEWS[h])tab=h;
 render();
