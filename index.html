@@ -29,6 +29,7 @@
   --card:rgba(255,255,255,.72); --card-2:rgba(255,255,255,.5); --line:rgba(15,42,68,.10);
   --shadow:0 6px 24px rgba(30,70,120,.10);
   --rose:#b85a74; --rose-soft:rgba(184,90,116,.12);
+  --sanad:#6f8db0;
   --y0:rgba(15,42,68,.07); --y1:#cfe3f6; --y2:#94c2ec; --y3:#4f97da; --y4:#1f5fa8; --ypd:#e9b7c5;
   --f-display:"Newsreader",Georgia,"Times New Roman",serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,"Amiri",sans-serif;
@@ -44,6 +45,7 @@
   --card:rgba(255,255,255,.07); --card-2:rgba(255,255,255,.04); --line:rgba(232,240,250,.10);
   --shadow:0 6px 24px rgba(0,0,0,.25);
   --rose:#e79ab0; --rose-soft:rgba(231,154,176,.14);
+  --sanad:#7f9cc0;
   --y0:rgba(232,240,250,.07); --y1:#1d3b63; --y2:#2d5f98; --y3:#4f94d6; --y4:#a9d4ff; --ypd:#7c4458;
   color-scheme:dark;
 }
@@ -146,6 +148,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent)}
 .dhikr{display:flex;flex-direction:column;gap:10px;width:100%;text-align:inherit}
 .lwa{display:flex;flex-wrap:wrap;direction:rtl;gap:0 7px;justify-content:flex-start}
 .lwa i{display:block;background:var(--ink);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;flex:none}
+.sanad{color:var(--sanad)}
 .hz{display:block;width:100%;height:auto}
 :root[data-sky="night"] .hz{filter:invert(.93)}
 .hzpage{font-size:12px;color:var(--muted);text-align:center;letter-spacing:.08em;margin:6px 0 2px}
@@ -333,10 +336,12 @@ const WDAY=['sun','mon','tue','wed','thu','fri','sat'],WNAME={sat:'Saturday',sun
 let HZI=null;const HZURL={};
 async function hizbDay(k){if(!HZI)HZI=await getJSON('hizb-index.json');
   if(!HZURL[k]){const r=await fetch(`hizb-${k}.bin`);if(!r.ok)throw new Error('hizb '+k);const buf=await r.arrayBuffer();
-    HZURL[k]=HZI.days[k].map(([p,h,o,l,n])=>({p,h,n,u:URL.createObjectURL(new Blob([buf.slice(o,o+l)],{type:'image/webp'}))}))}
+    HZURL[k]=HZI.days[k].map(([p,h,o,l,n,dn])=>({p,h,n,dn,u:URL.createObjectURL(new Blob([buf.slice(o,o+l)],{type:'image/webp'}))}))}
   return HZURL[k]}
 function lwaHTML(k){const v=LWA[k];return `<div class="lwa" lang="ar" aria-label="Dua ${k}">`+v.w.map(([x,w])=>`<i class="w-${k}" style="width:${(w*WS).toFixed(1)}px;height:${(v.h*WS).toFixed(1)}px;-webkit-mask-size:${(v.W*WS).toFixed(1)}px ${(v.h*WS).toFixed(1)}px;mask-size:${(v.W*WS).toFixed(1)}px ${(v.h*WS).toFixed(1)}px;-webkit-mask-position:-${(x*WS).toFixed(1)}px 0;mask-position:-${(x*WS).toFixed(1)}px 0"></i>`).join('')+'</div>'}
-async function meta(){return META||(META=await getJSON('hadith-meta.json'))}
+let SANAD=null;
+async function meta(){if(!SANAD)SANAD=await getJSON('hadith-sanad.json').catch(()=>({}));return META||(META=await getJSON('hadith-meta.json'))}
+function arWithSanad(n,ar){const e=SANAD&&SANAD[String(n)];return e?`<span class="sanad">${esc(ar.slice(0,e))}</span>${esc(ar.slice(e))}`:esc(ar)}
 async function hadithDay(i){const m=await meta();const ch=await getJSON(`hadith-${pad(Math.floor(i/m.chunk)+1)}.json`);return ch[i%m.chunk]}
 async function quran(){if(QURAN)return QURAN;const q=await getJSON('quran.json');const byPage={},bySA={};for(const a of q.ayahs){(byPage[a[2]]||(byPage[a[2]]=[])).push(a);bySA[a[0]+':'+a[1]]=a}
   return QURAN={...q,byPage,bySA}}
@@ -484,7 +489,7 @@ function hcard(h,d,m){const done=!!S.hadith[h.n];const book=m.sections[String(h.
   return `<article class="card hcard ${done?'is-done':''}" id="h-${String(h.n).replace('.','_')}">
    <div class="head"><div class="ref">Bukhari ${h.n}${book?` · ${esc(book)}`:''}</div>
    <button class="tick" data-act="htick" data-v="${h.n}" aria-label="Mark hadith ${h.n} read" aria-pressed="${done}">${ICON.check}</button></div>
-   <div class="ar" lang="ar">${esc(h.ar)}</div>
+   <div class="ar" lang="ar">${arWithSanad(h.n,h.ar)}</div>
    ${h.en?`<div class="en">${esc(h.en)}</div>`:''}</article>`}
 
 /* ---------- QURAN ---------- */
@@ -549,20 +554,20 @@ async function viewAdhkar(){
   const seg=`<div class="seg" role="group" aria-label="Adhkar set">${[['m','Morning'],['e','Evening'],['z','Manzil'],['h','Hizb']].map(([v,l])=>`<button data-act="aset" data-v="${v}" aria-pressed="${w===v}">${l}</button>`).join('')}</div>`;
   if(w==='h'){
     const today=WDAY[new Date().getDay()];if(!ui.hz)ui.hz=today;const k=ui.hz;
-    const lines=await hizbDay(k);const isToday=k===today;d.hzp=d.hzp||{};
-    const byP=[];for(const x of lines){let g=byP[byP.length-1];if(!g||g.p!==x.p){g={p:x.p,l:[]};byP.push(g)}g.l.push(x)}
-    const hn=byP.filter(g=>d.hzp[g.p]).length;
-    let html=byP.map(g=>{const on=isToday&&!!d.hzp[g.p];
-      return `<div class="card hzpg ${on?'is-done':''}" ${isToday?`role="button" tabindex="0" data-act="hzpage" data-v="${g.p}"`:''} style="padding:10px 10px 12px">
-        <div class="row between" style="padding:0 6px 4px"><span class="hzpage" style="margin:0">PAGE ${g.p}</span>${isToday?`<span class="count" style="font-family:var(--f-display);font-weight:600;color:var(--done)">${on?'✓':''}</span>`:''}</div>
+    const lines=await hizbDay(k);const isToday=k===today;d.hzd=d.hzd||{};
+    const byD=[];for(const x of lines){let g=byD[byD.length-1];if(!g||g.dn!==x.dn){g={dn:x.dn,l:[]};byD.push(g)}g.l.push(x)}
+    const hn=byD.filter(g=>d.hzd[g.dn]).length;
+    let html=byD.map(g=>{const on=isToday&&!!d.hzd[g.dn];const p0=g.l[0].p,p1=g.l[g.l.length-1].p;
+      return `<div class="card hzpg ${on?'is-done':''}" ${isToday?`role="button" tabindex="0" data-act="hzdua" data-v="${g.dn}"`:''} style="padding:10px 10px 12px">
+        <div class="row between" style="padding:0 6px 4px"><span class="hzpage" style="margin:0">DUA ${g.dn} · PAGE ${p0}${p1>p0?'–'+p1:''}</span>${isToday?`<span class="count" style="font-family:var(--f-display);font-weight:600;color:var(--done)">${on?'✓':''}</span>`:''}</div>
         ${g.l.map(x=>`<img class="hz" src="${x.u}" width="${HZI.w}" height="${x.h}" loading="lazy" decoding="async" alt="">`).join('')}</div>`}).join('');
-    S._hzpages=byP.map(g=>g.p);
+    S._hzduas=byD.map(g=>g.dn);
     const order=['sat','sun','mon','tue','wed','thu','fri'];
     return `<section class="view">${seg}
      <div class="card"><div class="row between"><div><span class="eyebrow">Hizbul Azam</span><div style="font-weight:600;margin-top:2px">${WNAME[k]}${k===today?' · today':''}</div></div>${k===today?`<span class="status ${d.hz?'ok':''}">${d.hz?'✓ Read':'Not yet'}</span>`:''}</div>
      <div class="hzday" style="margin-top:12px">${order.map(x=>`<button data-act="hzday" data-v="${x}" aria-pressed="${x===k}">${WNAME[x].slice(0,3)}${x===today?' •':''}</button>`).join('')}</div>
-     <p class="small muted" style="margin:10px 0 0">Ta'limi Board (KZN) edition. Page numbers match the printed book.${isToday?' Tap each page when you\'ve read it.':''}</p>
-     ${isToday?`<div class="row between" style="margin-top:10px"><b class="tnum" id="hzcount">${hn} of ${byP.length} pages</b><button class="btn ghost small" data-act="hizb">${d.hz?'Clear':'Mark all read'}</button></div>`:''}</div>
+     <p class="small muted" style="margin:10px 0 0">Ta'limi Board (KZN) edition. Dua numbers and pages match the printed book.${isToday?' Tap each dua when you\'ve read it.':''}</p>
+     ${isToday?`<div class="row between" style="margin-top:10px"><b class="tnum" id="hzcount">${hn} of ${byD.length} duas</b><button class="btn ghost small" data-act="hizb">${d.hz?'Clear':'Mark all read'}</button></div>`:''}</div>
      ${html}
      ${isToday?'':`<button class="btn ghost" data-act="hzday" data-v="${today}">Go to today's part</button>`}
     </section>`;
@@ -644,7 +649,7 @@ async function viewTasbih(){
   const t=todayKey(),mon=t.slice(0,8)+'01',yr=t.slice(0,5)+'01-01';
   const all=(f)=>S.tasbih.items.reduce((a,x)=>a+tasbihSum(x.id,f),0);
   return `<section class="view"><div style="text-align:center"><h1>Tasbih</h1></div>
-   <div class="card stats4"><div><span>Today</span><b class="tnum">${all(t).toLocaleString()}</b></div><div><span>Month</span><b class="tnum">${all(mon).toLocaleString()}</b></div><div><span>Year</span><b class="tnum">${all(yr).toLocaleString()}</b></div><div><span>Lifetime</span><b class="tnum">${all().toLocaleString()}</b></div></div>
+   <div class="card stats4" style="grid-template-columns:repeat(3,1fr)"><div><span>Today</span><b class="tnum">${all(t).toLocaleString()}</b></div><div><span>Month</span><b class="tnum">${all(mon).toLocaleString()}</b></div><div><span>Year</span><b class="tnum">${all(yr).toLocaleString()}</b></div></div>
    ${S.tasbih.items.map(x=>{const c=(S.tasbih.counts[x.id]||{})[t]||0;return `<button class="card titem" data-act="tcount" data-v="${x.id}">
      <div class="name">${tName(x)}</div>
      <div class="progress" style="width:100%;margin-top:4px"><i style="width:${Math.min(100,c/x.target*100)}%;background:${c>=x.target?'var(--done)':'var(--accent)'}"></i></div>
@@ -734,16 +739,16 @@ document.addEventListener('click',async e=>{
    case 'ycat':ui.ycat=v;render();break;
    case 'ysel':ui.ysel=v;await render();document.querySelector('.yrows')?.closest('.card').scrollIntoView({behavior:'smooth',block:'nearest'});break;
    case 'hzday':ui.hz=v;scrollTo(0,0);render();break;
-   case 'hizb':{const d=adhkarDay(t);d.hz=!d.hz;d.hzp={};if(d.hz)for(const p of (S._hzpages||[]))d.hzp[p]=1;save();render();break}
+   case 'hizb':{const d=adhkarDay(t);d.hz=!d.hz;d.hzd={};if(d.hz)for(const n of (S._hzduas||[]))d.hzd[n]=1;save();render();break}
    case 'manzil':{const d=adhkarDay(t);d.z=!d.z;d.zp={};if(d.z)MANZIL.forEach((_,i)=>d.zp[i]=1);save();render();break}
    case 'zpart':{const d=adhkarDay(t);d.zp=d.zp||{};if(d.zp[v])delete d.zp[v];else d.zp[v]=1;const on=!!d.zp[v];
      el.classList.toggle('is-done',on);el.querySelector('.count').textContent=on?'✓':'';buzz(on?15:8);
      const n=MANZIL.filter((_,i)=>d.zp[i]).length;d.z=n===MANZIL.length;save();const zc=document.getElementById('zcount');if(zc)zc.textContent=`${n} of ${MANZIL.length}`;
      if(d.z){toast('Manzil complete');render()}else if(on){const nx=el.nextElementSibling;if(nx)setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),200)}break}
-   case 'hzpage':{const d=adhkarDay(t);d.hzp=d.hzp||{};if(d.hzp[v])delete d.hzp[v];else d.hzp[v]=1;const on=!!d.hzp[v];
+   case 'hzdua':{const d=adhkarDay(t);d.hzd=d.hzd||{};if(d.hzd[v])delete d.hzd[v];else d.hzd[v]=1;const on=!!d.hzd[v];
      el.classList.toggle('is-done',on);el.querySelector('.count').textContent=on?'✓':'';buzz(on?15:8);
-     const all=S._hzpages||[];const n=all.filter(p=>d.hzp[p]).length;d.hz=all.length>0&&n===all.length;save();
-     const hc=document.getElementById('hzcount');if(hc)hc.textContent=`${n} of ${all.length} pages`;
+     const all=S._hzduas||[];const n=all.filter(x=>d.hzd[x]).length;d.hz=all.length>0&&n===all.length;save();
+     const hc=document.getElementById('hzcount');if(hc)hc.textContent=`${n} of ${all.length} duas`;
      if(d.hz){toast('Hizbul Azam complete');render()}else if(on){const nx=el.nextElementSibling;if(nx&&nx.classList.contains('hzpg'))setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),200)}break}
    case 'tcount':openCounter(v);break;
    case 'tinc':countTasbih(1);break;
