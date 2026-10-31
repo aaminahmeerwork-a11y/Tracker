@@ -224,13 +224,18 @@ const SALAH=[
  {id:'isha',name:'Isha',parts:[['s1',4,'Sunnah'],['f',4,'Fard'],['s2',2,'Sunnah'],['n1',2,'Nafl',1],['w',3,'Witr'],['n2',2,'Nafl',1]]},
 ];
 const DEFAULT_TASBIH=[
- {id:'k1',name:'1st Kalimah',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَّسُوْلُ اللّٰهِ',target:300},
- {id:'k3',name:'3rd Kalimah',ar:'سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ',target:300},
- {id:'ist',name:'Istighfar',ar:'استغفار',target:300},
- {id:'dur',name:'Durood',ar:'درود',target:1000},
- {id:'sbh',name:'SubhanAllahi wa bihamdihi',ar:'سُبْحَانَ اللّٰهِ وَبِحَمْدِهٖ',target:200},
- {id:'tah',name:'La ilaha illallah wahdahu',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهٗ لَا شَرِيْكَ لَهٗ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ',target:200},
+ {id:'k1',name:'1st Kalimah',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَّسُوْلُ اللّٰهِ',target:100},
+ {id:'k3',name:'3rd Kalimah',ar:'سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ',target:100},
+ {id:'ist',name:'Istighfar',ar:'استغفار',target:100},
+ {id:'dur',name:'Durood',ar:'درود',target:300},
+ {id:'sbh',name:'SubhanAllahi wa bihamdihi',ar:'سُبْحَانَ اللّٰهِ وَبِحَمْدِهٖ',target:100},
+ {id:'tah',name:'La ilaha illallah wahdahu',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهٗ لَا شَرِيْكَ لَهٗ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ',target:100},
+ {id:'tak',name:'SubhanAllah, Alhamdulillah, Allahu Akbar',ar:'سُبْحَانَ اللّٰهِ، اَلْحَمْدُ لِلّٰهِ، اَللّٰهُ أَكْبَرُ',target:100,split:true},
 ];
+const sessNow=()=>new Date().getHours()<12?'m':'e';
+const SESS={m:'Morning',e:'Evening'};
+function sessCounts(id,k){const s=((S.tasbih.sess||{})[id]||{})[k]||{};return{m:s.m||0,e:s.e||0}}
+function tDone(x,k){if(x.split){const s=sessCounts(x.id,k);return s.m>=x.target&&s.e>=x.target}return((S.tasbih.counts[x.id]||{})[k]||0)>=x.target}
 const tName=x=>x.ar?`<span class="tar" lang="ar" dir="rtl">${esc(x.ar)}</span>`:esc(x.name);
 const ICON={
  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>',
@@ -261,7 +266,8 @@ function fresh(){return{v:1,hadith:{},quran:{pages:{},khatam:0},salah:{},periods
 function load(){try{const raw=localStorage.getItem(STORE);S=raw?JSON.parse(raw):fresh()}catch(e){S=fresh()}
   const f=fresh();for(const k in f) if(S[k]===undefined) S[k]=f[k];
   if(!S.hijri) S.hijri=initHijri();
-  for(const d of DEFAULT_TASBIH){const it=S.tasbih.items.find(i=>i.id===d.id);if(!it)S.tasbih.items.push({...d});else it.ar=d.ar}
+  for(const d of DEFAULT_TASBIH){const it=S.tasbih.items.find(i=>i.id===d.id);if(!it)S.tasbih.items.push({...d});else{it.ar=d.ar;it.target=d.target;it.split=!!d.split}}
+  if(!S.tasbih.sess) S.tasbih.sess={};
   if(!S.quran.log) S.quran.log={};}
 let saveT;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){toast('Could not save. Phone storage may be full.')}},150)}
@@ -436,7 +442,7 @@ async function viewHome(){
   ${mq?`<div class="card"><div class="row" style="gap:12px">${ICON.moon.replace('<svg','<svg width="28" height="28"')}<div style="flex:1"><b>Was the ${mq.next} moon sighted tonight?</b><div class="small muted">Answer once your masjid announces.</div></div></div>
     <div class="row" style="margin-top:12px"><button class="btn" data-act="moon" data-v="1">Yes, sighted</button><button class="btn ghost" data-act="moon" data-v="0">No, 30 days</button></div></div>`:''}
   <div class="card periodcard ${per?'on':''}"><div><div class="eyebrow">Period days</div><div style="font-weight:600;margin-top:2px">${per?`On since ${fmtDate(per.s)} · day ${diffDays(per.s,t)+1}`:'Off'}</div>
-    <div class="small muted">${per?'Salah and Quran are paused. Hadith, adhkar and Manzil carry on.':'Turn on to pause salah and Quran.'}</div></div>
+    <div class="small muted">${per?'Salah, Quran and Manzil are paused, and Quranic duas in Hizb are hidden.':'Turn on to pause salah, Quran and Manzil.'}</div></div>
     <button class="btn ${per?'':'ghost'}" style="${per?'background:var(--rose);color:#fff':''}" data-act="period">${per?'End':'Start'}</button></div>
   ${salahRing}
   <div class="grid2">
@@ -447,7 +453,7 @@ async function viewHome(){
       <div class="big tnum">${QT.done}<span class="muted" style="font-size:18px">/${QT.n}</span></div>
       <div class="sub">${qPaused?'Paused (period days)':(QT.tb.pre?`Starts ${fmtDate(START)}: ${QT.range}`:`Today: ${QT.range}`)}</div>${t>=START&&!qPaused?statusPill(qs.diff,'pages'):''}</button>
     <button class="card plan" data-act="tab" data-v="adhkar"><span class="eyebrow">Adhkar</span>
-      <div class="row" style="gap:8px;flex-wrap:wrap">${[['Morning',mDone],['Evening',eDone],['Manzil',zDone],['Hizb',hDone]].map(([l,d])=>`<span class="status ${d?'ok':''}">${d?'✓ ':''}${l}</span>`).join('')}</div></button>
+      <div class="row" style="gap:8px;flex-wrap:wrap">${[['Morning',mDone],['Evening',eDone],...(isPeriod(t)?[]:[['Manzil',zDone]]),['Hizb',hDone]].map(([l,d])=>`<span class="status ${d?'ok':''}">${d?'✓ ':''}${l}</span>`).join('')}</div></button>
     <button class="card plan" data-act="tab" data-v="tasbih"><span class="eyebrow">Tasbih</span>
       <div class="big tnum">${tt.toLocaleString()}</div><div class="sub">counted today</div></button>
   </div>
@@ -555,7 +561,9 @@ async function viewAdhkar(){
   if(w==='h'){
     const today=WDAY[new Date().getDay()];if(!ui.hz)ui.hz=today;const k=ui.hz;
     const lines=await hizbDay(k);const isToday=k===today;d.hzd=d.hzd||{};
-    const byD=[];for(const x of lines){let g=byD[byD.length-1];if(!g||g.dn!==x.dn){g={dn:x.dn,l:[]};byD.push(g)}g.l.push(x)}
+    let byD=[];for(const x of lines){let g=byD[byD.length-1];if(!g||g.dn!==x.dn){g={dn:x.dn,l:[]};byD.push(g)}g.l.push(x)}
+    const perHide=isPeriod(todayKey())&&(HZI.quranic||{})[k];let hidden=0;
+    if(perHide){const before=byD.length;byD=byD.filter(g=>!perHide.includes(g.dn));hidden=before-byD.length}
     const hn=byD.filter(g=>d.hzd[g.dn]).length;
     let html=byD.map(g=>{const on=isToday&&!!d.hzd[g.dn];const p0=g.l[0].p,p1=g.l[g.l.length-1].p;
       return `<div class="card hzpg ${on?'is-done':''}" ${isToday?`role="button" tabindex="0" data-act="hzdua" data-v="${g.dn}"`:''} style="padding:10px 10px 12px">
@@ -567,11 +575,13 @@ async function viewAdhkar(){
      <div class="card"><div class="row between"><div><span class="eyebrow">Hizbul Azam</span><div style="font-weight:600;margin-top:2px">${WNAME[k]}${k===today?' · today':''}</div></div>${k===today?`<span class="status ${d.hz?'ok':''}">${d.hz?'✓ Read':'Not yet'}</span>`:''}</div>
      <div class="hzday" style="margin-top:12px">${order.map(x=>`<button data-act="hzday" data-v="${x}" aria-pressed="${x===k}">${WNAME[x].slice(0,3)}${x===today?' •':''}</button>`).join('')}</div>
      <p class="small muted" style="margin:10px 0 0">Ta'limi Board (KZN) edition. Dua numbers and pages match the printed book.${isToday?' Tap each dua when you\'ve read it.':''}</p>
+     ${hidden?`<div class="banner rose" style="margin-top:10px">Period days: ${hidden} Quranic dua${hidden>1?'s are':' is'} hidden. Falaq and Nās stay.</div>`:''}
      ${isToday?`<div class="row between" style="margin-top:10px"><b class="tnum" id="hzcount">${hn} of ${byD.length} duas</b><button class="btn ghost small" data-act="hizb">${d.hz?'Clear':'Mark all read'}</button></div>`:''}</div>
      ${html}
      ${isToday?'':`<button class="btn ghost" data-act="hzday" data-v="${today}">Go to today's part</button>`}
     </section>`;
   }
+  if(w==='z'&&isPeriod(t)) return `<section class="view">${seg}<div class="card paused"><div class="eyebrow">Manzil</div><h2 style="margin:8px 0">Paused for period days</h2><p class="muted">It comes back when you end period days on Home.</p></div></section>`;
   if(w==='z'){
     const Q=await quran();if(!MANZIL)MANZIL=await getJSON('manzil.json');
     d.zp=d.zp||{};const zn=MANZIL.filter((_,i)=>d.zp[i]).length;
@@ -601,10 +611,10 @@ const YCATS=[['all','Everything'],['salah','Salah'],['quran','Quran'],['hadith',
 function yearDay(k){
   const per=isPeriod(k),i=diffDays(START,k),plan=META.plan[i]||[];
   const qTick=Object.values(S.quran.pages).filter(d=>d===k).length,qTarget=(S.quran.log||{})[k]||2;
-  const a=S.adhkar[k]||{};const parts=[adhkarDone(k,'m'),adhkarDone(k,'e'),!!a.z,!!a.hz];
-  const tas=S.tasbih.items.every(x=>((S.tasbih.counts[x.id]||{})[k]||0)>=x.target);
+  const a=S.adhkar[k]||{};const per0=isPeriod(k);const parts=per0?[adhkarDone(k,'m'),adhkarDone(k,'e'),!!a.hz]:[adhkarDone(k,'m'),adhkarDone(k,'e'),!!a.z,!!a.hz];
+  const tas=S.tasbih.items.every(x=>tDone(x,k));
   return{per,fard:fardCount(k),q:Math.min(1,qTick/qTarget),qTick,h:plan.length?plan.filter(n=>S.hadith[n]).length/plan.length:0,hN:plan.filter(n=>S.hadith[n]).length,hT:plan.length,
-    m:parts[0],e:parts[1],z:parts[2],hz:parts[3],ad:parts.filter(Boolean).length/4,tas,tah:!!(S.salah[k]||{}).tahajjud};
+    m:parts[0],e:parts[1],z:per0?null:parts[2],hz:per0?parts[2]:parts[3],ad:parts.filter(Boolean).length/parts.length,tas,tah:!!(S.salah[k]||{}).tahajjud};
 }
 function yScore(d,c){if(d.per&&(c==='salah'||c==='quran'))return 'p';
   const v={salah:d.fard/5,quran:d.q,hadith:d.h,adhkar:d.ad};
@@ -631,7 +641,7 @@ async function viewYear(){
   if(ui.ysel&&days[ui.ysel]){const d=days[ui.ysel];const y=(b,txt,f)=>`<span>${txt}</span><span class="${b?'ok':'no'}">${b?'✓ '+(f||'Done'):(f||'Not done')}</span>`;
     detail=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>${fmtDate(ui.ysel,{weekday:'long',day:'numeric',month:'long'})}</h3><div class="small muted" style="margin-top:-6px">${hijriText(ui.ysel)}</div>
       <div class="yrows">${d.per?`<span>Salah · Quran</span><span class="no">Period day</span>`:y(d.fard===5,'Fard salah',d.fard+'/5')+y(d.q>=1,'Quran',d.qTick+' page'+(d.qTick===1?'':'s'))+y(d.tah,'Tahajjud')}
-      ${y(d.hT&&d.hN===d.hT,'Hadith',d.hN+'/'+d.hT)}${y(d.m,'Morning adhkar')}${y(d.e,'Evening adhkar')}${y(d.z,'Manzil')}${y(d.hz,'Hizbul Azam')}${y(d.tas,'All tasbih targets')}</div></div>`}
+      ${y(d.hT&&d.hN===d.hT,'Hadith',d.hN+'/'+d.hT)}${y(d.m,'Morning adhkar')}${y(d.e,'Evening adhkar')}${d.z===null?'':y(d.z,'Manzil')}${y(d.hz,'Hizbul Azam')}${y(d.tas,'All tasbih targets')}</div></div>`}
   return `<section class="view">
    <div class="daynav"><button class="iconbtn" data-act="tab" data-v="home" aria-label="Back">${ICON.left}</button><div style="text-align:center"><h2>Year View</h2><div class="small muted">1 Nov 2026 – 31 Oct 2027</div></div><span style="width:40px"></span></div>
    <div class="card stats4"><div><span>Full days</span><b class="tnum">${full}</b></div><div><span>Streak</span><b class="tnum">${best}</b></div><div><span>Hadith</span><b class="tnum">${hadRead.toLocaleString()}</b></div><div><span>Pages</span><b class="tnum">${pages}</b></div></div>
@@ -647,32 +657,41 @@ async function viewYear(){
 function tasbihSum(id,from,to){const c=S.tasbih.counts[id]||{};let s=0;for(const k in c) if((!from||k>=from)&&(!to||k<=to)) s+=c[k];return s}
 async function viewTasbih(){
   const t=todayKey(),mon=t.slice(0,8)+'01',yr=t.slice(0,5)+'01-01';
-  const all=(f)=>S.tasbih.items.reduce((a,x)=>a+tasbihSum(x.id,f),0);
   return `<section class="view"><div style="text-align:center"><h1>Tasbih</h1></div>
-   <div class="card stats4" style="grid-template-columns:repeat(3,1fr)"><div><span>Today</span><b class="tnum">${all(t).toLocaleString()}</b></div><div><span>Month</span><b class="tnum">${all(mon).toLocaleString()}</b></div><div><span>Year</span><b class="tnum">${all(yr).toLocaleString()}</b></div></div>
-   ${S.tasbih.items.map(x=>{const c=(S.tasbih.counts[x.id]||{})[t]||0;return `<button class="card titem" data-act="tcount" data-v="${x.id}">
+   ${S.tasbih.items.map(x=>{const c=(S.tasbih.counts[x.id]||{})[t]||0,life=tasbihSum(x.id),done=tDone(x,t);
+     if(x.split){const ss=sessCounts(x.id,t),fr=(Math.min(ss.m,x.target)+Math.min(ss.e,x.target))/(2*x.target);
+       return `<button class="card titem" data-act="tcount" data-v="${x.id}">
+     <div class="name">${tName(x)}</div>
+     <div class="progress" style="width:100%;margin-top:4px"><i style="width:${fr*100}%;background:${done?'var(--done)':'var(--accent)'}"></i></div>
+     <div class="row between small" style="width:100%"><span class="muted tnum">Morning ${ss.m}/${x.target} · Evening ${ss.e}/${x.target}</span></div>
+     <div class="row between small" style="width:100%"><span class="muted">All-time · <b class="tnum">${life.toLocaleString()}</b></span><b class="tnum" style="color:${done?'var(--done)':'var(--gold)'}">Today · ${c.toLocaleString()}</b></div></button>`}
+     return `<button class="card titem" data-act="tcount" data-v="${x.id}">
      <div class="name">${tName(x)}</div>
      <div class="progress" style="width:100%;margin-top:4px"><i style="width:${Math.min(100,c/x.target*100)}%;background:${c>=x.target?'var(--done)':'var(--accent)'}"></i></div>
-     <div class="row between small" style="width:100%"><span class="muted">Target ×${x.target.toLocaleString()}</span><b class="tnum" style="color:${c>=x.target?'var(--done)':'var(--gold)'}">Today · ${c.toLocaleString()}</b></div></button>`}).join('')}
+     <div class="row between small" style="width:100%"><span class="muted">Target ×${x.target.toLocaleString()} · All-time <b class="tnum">${life.toLocaleString()}</b></span><b class="tnum" style="color:${c>=x.target?'var(--done)':'var(--gold)'}">Today · ${c.toLocaleString()}</b></div></button>`}).join('')}
    <button class="btn ghost" data-act="tadd">+ Add your own</button></section>`;
 }
 let counterId=null;
 function openCounter(id){counterId=id;drawCounter()}
 function drawCounter(){const x=S.tasbih.items.find(i=>i.id===counterId);if(!x){document.getElementById('overlay').innerHTML='';return}
-  const t=todayKey(),c=(S.tasbih.counts[x.id]||{})[t]||0,N=33,R=150,act=c%N;
+  const t=todayKey(),sk=sessNow(),c=x.split?sessCounts(x.id,t)[sk]:((S.tasbih.counts[x.id]||{})[t]||0),N=33,R=150,act=c%N;
   const beads=[...Array(N)].map((_,i)=>{const a=(-90+i*360/N)*Math.PI/180,bx=180+R*Math.cos(a),by=180+R*Math.sin(a),on=i<act||(c>0&&act===0);
     return `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${i===act?12:10}" fill="${i===act?'var(--sky-3)':(on?'var(--accent)':'var(--card)')}" stroke="${i===act?'var(--gold)':'var(--line)'}" stroke-width="${i===act?3:1.5}"/>`}).join('');
   document.getElementById('overlay').innerHTML=`<div class="counter" role="dialog" aria-label="${esc(x.name)} counter">
-   <div class="row between"><button class="iconbtn" data-act="tclose" aria-label="Back">${ICON.left}</button><div class="small muted" style="text-align:center;flex:1">Target ×${x.target.toLocaleString()}</div><div class="row" style="gap:6px"><button class="btn ghost small" data-act="tadd1">+ Add</button><button class="btn ghost small" data-act="tundo">−1</button></div></div>
+   <div class="row between"><button class="iconbtn" data-act="tclose" aria-label="Back">${ICON.left}</button><div class="small muted" style="text-align:center;flex:1">${x.split?SESS[sk]+' · ':''}Target ×${x.target.toLocaleString()}</div><div class="row" style="gap:6px"><button class="btn ghost small" data-act="tadd1">+ Add</button><button class="btn ghost small" data-act="tundo">−1</button></div></div>
    <div style="margin-top:10px">${x.ar?tName(x):`<h2 style="text-align:center">${esc(x.name)}</h2>`}</div>
    <div class="ring" data-act="tinc"><div class="beads"><svg viewBox="0 0 360 360" aria-hidden="true"><circle cx="180" cy="180" r="${R}" fill="none" stroke="var(--line)" stroke-width="2"/>${beads}</svg>
      <div class="num"><div><b class="tnum">${c.toLocaleString()}</b><span class="muted tnum">/ ${x.target.toLocaleString()}</span>${c>=x.target?'<div class="status ok" style="margin-top:8px">Target reached</div>':''}</div></div></div></div>
    <p class="small muted" style="text-align:center;margin:0">Tap anywhere on the beads to count. Keeps counting past the target.</p>
    ${S.tasbih.items.length>DEFAULT_TASBIH.length&&!DEFAULT_TASBIH.some(d=>d.id===x.id)?`<button class="btn ghost small" data-act="tdel" style="align-self:center;margin-top:10px">Remove this tasbih</button>`:''}</div>`;
 }
+function addCount(x,t,delta){const c=S.tasbih.counts[x.id]||(S.tasbih.counts[x.id]={});
+  if(x.split){const all=S.tasbih.sess[x.id]||(S.tasbih.sess[x.id]={}),d=all[t]||(all[t]={m:0,e:0}),k=sessNow();
+    const ch=Math.max(-d[k],delta);d[k]+=ch;c[t]=Math.max(0,(c[t]||0)+ch);return d[k]}
+  c[t]=Math.max(0,(c[t]||0)+delta);return c[t]}
 function countTasbih(delta){const x=S.tasbih.items.find(i=>i.id===counterId);if(!x)return;const t=todayKey();
-  const c=S.tasbih.counts[x.id]||(S.tasbih.counts[x.id]={});const before=c[t]||0;c[t]=Math.max(0,before+delta);
-  if(delta>0){ if(c[t]===x.target) buzz([90,60,90,60,160]); else if(c[t]%33===0) buzz(45); else buzz(12);}
+  const now=addCount(x,t,delta);
+  if(delta>0){ if(now===x.target) buzz([90,60,90,60,160]); else if(now%33===0) buzz(45); else buzz(12);}
   save();drawCounter();}
 
 /* ---------- settings ---------- */
@@ -760,7 +779,7 @@ document.addEventListener('click',async e=>{
      document.getElementById('overlay').appendChild(box);setTimeout(()=>document.getElementById('tn2')?.focus(),50);break}
    case 'tcancel':document.querySelector('#overlay .sheet')?.remove();break;
    case 'taddsave':{const n=parseInt(document.getElementById('tn2').value);if(!(n>0)){toast('Type a number first');break}
-     const x=S.tasbih.items.find(i=>i.id===counterId),c=S.tasbih.counts[x.id]||(S.tasbih.counts[x.id]={});c[t]=(c[t]||0)+n;save();buzz(30);toast(`Added ${n.toLocaleString()}`);drawCounter();break}
+     const x=S.tasbih.items.find(i=>i.id===counterId);addCount(x,t,n);save();buzz(30);toast(`Added ${n.toLocaleString()}`);drawCounter();break}
    case 'tclose':closeOverlay();render();break;
    case 'tdel':{S.tasbih.items=S.tasbih.items.filter(i=>i.id!==counterId);save();closeOverlay();render();break}
    case 'tadd':addTasbih();break;
