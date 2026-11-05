@@ -31,6 +31,7 @@
   --rose:#b85a74; --rose-soft:rgba(184,90,116,.12);
   --sanad:#6f8db0;
   --y0:rgba(15,42,68,.07); --y1:#cfe3f6; --y2:#94c2ec; --y3:#4f97da; --y4:#1f5fa8; --ypd:#e9b7c5;
+  --h-salah:#1f8a5b; --h-quran:#2f80c8; --h-hadith:#b07a2a; --h-adhkar:#7b5cc4; --h-tasbih:#d0644a;
   --f-display:"Newsreader",Georgia,"Times New Roman",serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,"Amiri",sans-serif;
   --f-ar:"Amiri","Noto Naskh Arabic","Geeza Pro",serif;
@@ -47,6 +48,7 @@
   --rose:#e79ab0; --rose-soft:rgba(231,154,176,.14);
   --sanad:#7f9cc0;
   --y0:rgba(232,240,250,.07); --y1:#1d3b63; --y2:#2d5f98; --y3:#4f94d6; --y4:#a9d4ff; --ypd:#7c4458;
+  --h-salah:#5fd29a; --h-quran:#7db8ee; --h-hadith:#e3b96e; --h-adhkar:#b49cf0; --h-tasbih:#f0927a;
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -176,7 +178,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent)}
 .titem{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;width:100%}
 .titem .name{font-family:var(--f-display);font-size:22px;font-weight:600}
 .tar{font-family:var(--f-ar);font-size:18px;line-height:1.9;font-weight:400;display:block;text-align:center}
-.counter{position:fixed;inset:0;z-index:40;background:linear-gradient(180deg,var(--sky-1),var(--sky-3));display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(16px,env(safe-area-inset-left,0px))}
+.counter{position:fixed;inset:0;z-index:40;overflow-y:auto;background:linear-gradient(180deg,var(--sky-1),var(--sky-3));display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(16px,env(safe-area-inset-left,0px))}
 .counter .ring{flex:1;display:grid;place-items:center;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .counter .beads{width:min(84vw,360px);aspect-ratio:1;position:relative;max-width:100%}
 .counter .beads svg{width:100%;height:100%}
@@ -189,17 +191,22 @@ nav.tabs button[aria-current="page"]{color:var(--accent)}
 .field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
 .field input,.field textarea{font:inherit;font-weight:400;padding:11px 13px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);transform:translateX(-50%);background:var(--ink);color:var(--sky-3);padding:10px 16px;border-radius:99px;font-size:14px;font-weight:600;z-index:60;box-shadow:var(--shadow)}
-.yg{display:grid;grid-template-columns:22px repeat(12,1fr);gap:3px;align-items:center}
-.yg .mh{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;padding-bottom:3px}
-.yg .dn{font-size:10px;color:var(--muted);text-align:right;padding-right:3px;font-variant-numeric:tabular-nums}
-.ypx{aspect-ratio:1;border-radius:4px;background:var(--y0);width:100%;max-width:100%;display:block}
-.ypx.f{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
-.ypx.x{visibility:hidden}.ypx.p{background:var(--ypd)}.ypx.t{box-shadow:0 0 0 2px var(--accent)}.ypx.sel{outline:2px solid var(--gold);outline-offset:1px}
-.ypx.l1{background:var(--y1)}.ypx.l2{background:var(--y2)}.ypx.l3{background:var(--y3)}.ypx.l4{background:var(--y4)}
-.ylegend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12.5px;color:var(--ink-2);align-items:center}
-.ylegend i{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:5px}
-.yrows{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14px}
-.yrows .ok{color:var(--done);font-weight:600}.yrows .no{color:var(--muted)}
+.mwk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin:14px 0 4px}
+.mcal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mday{aspect-ratio:1/1.12;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 2px 7px;background:var(--card-2);border:1px solid transparent;min-width:0}
+.mday .n{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.mday .dots{display:grid;grid-template-columns:repeat(3,6px);gap:3px;justify-content:center}
+.mday .dots i{width:6px;height:6px;border-radius:50%;display:block;background:var(--line)}
+.mday.per{background:var(--rose-soft)}.mday.today{border-color:var(--accent)}.mday.sel{border-color:var(--gold);border-width:2px}
+.mday.future{opacity:.45}.mday.empty{visibility:hidden}
+.mlegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2)}
+.mlegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.msum{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:14.5px;align-items:center}
+.mbar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;grid-column:1/-1;margin-top:-4px}.mbar>i{display:block;height:100%;border-radius:99px}
+.yrows{display:grid;grid-template-columns:1fr auto;gap:7px 12px;font-size:14.5px}
+.yrows .ok{font-weight:600}.yrows .no{color:var(--muted)}
+.durcard{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.durcard .ar{font-size:22px;line-height:2;text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -453,12 +460,12 @@ async function viewHome(){
       <div class="big tnum">${QT.done}<span class="muted" style="font-size:18px">/${QT.n}</span></div>
       <div class="sub">${qPaused?'Paused (period days)':(QT.tb.pre?`Starts ${fmtDate(START)}: ${QT.range}`:`Today: ${QT.range}`)}</div>${t>=START&&!qPaused?statusPill(qs.diff,'pages'):''}</button>
     <button class="card plan" data-act="tab" data-v="adhkar"><span class="eyebrow">Adhkar</span>
-      <div class="row" style="gap:8px;flex-wrap:wrap">${[['Morning',mDone],['Evening',eDone],...(isPeriod(t)?[]:[['Manzil',zDone]]),['Hizb',hDone]].map(([l,d])=>`<span class="status ${d?'ok':''}">${d?'✓ ':''}${l}</span>`).join('')}</div></button>
+      <div class="row" style="gap:8px;flex-wrap:wrap">${[['Morning',mDone],['Evening',eDone],...(isPeriod(t)?[]:[['Manzil',zDone]])].map(([l,d])=>`<span class="status ${d?'ok':''}">${d?'✓ ':''}${l}</span>`).join('')}</div></button>
     <button class="card plan" data-act="tab" data-v="tasbih"><span class="eyebrow">Tasbih</span>
       <div class="big tnum">${tt.toLocaleString()}</div><div class="sub">counted today</div></button>
   </div>
   <div class="card"><div class="row between" style="margin-bottom:12px"><span class="eyebrow">Last 7 days</span><span class="small muted">Fard salah + adhkar</span></div><div class="week">${week}</div>
-    <button class="btn ghost" data-act="year" style="width:100%;margin-top:14px">View your year</button></div>
+    <button class="btn ghost" data-act="month" style="width:100%;margin-top:14px">View your month</button></div>
   </section>`;
 }
 
@@ -606,50 +613,48 @@ async function viewAdhkar(){
   </section>`;
 }
 
-/* ---------- YEAR VIEW ---------- */
-const YCATS=[['all','Everything'],['salah','Salah'],['quran','Quran'],['hadith','Hadith'],['adhkar','Adhkar']];
-function yearDay(k){
+/* ---------- MONTH VIEW ---------- */
+const MH=[['salah','Salah'],['quran','Quran'],['hadith','Hadith'],['adhkar','Adhkar'],['tasbih','Tasbih']];
+function monthDay(k){
   const per=isPeriod(k),i=diffDays(START,k),plan=META.plan[i]||[];
   const qTick=Object.values(S.quran.pages).filter(d=>d===k).length,qTarget=(S.quran.log||{})[k]||2;
-  const a=S.adhkar[k]||{};const per0=isPeriod(k);const parts=per0?[adhkarDone(k,'m'),adhkarDone(k,'e'),!!a.hz]:[adhkarDone(k,'m'),adhkarDone(k,'e'),!!a.z,!!a.hz];
-  const tas=S.tasbih.items.every(x=>tDone(x,k));
-  return{per,fard:fardCount(k),q:Math.min(1,qTick/qTarget),qTick,h:plan.length?plan.filter(n=>S.hadith[n]).length/plan.length:0,hN:plan.filter(n=>S.hadith[n]).length,hT:plan.length,
-    m:parts[0],e:parts[1],z:per0?null:parts[2],hz:per0?parts[2]:parts[3],ad:parts.filter(Boolean).length/parts.length,tas,tah:!!(S.salah[k]||{}).tahajjud};
+  const hN=plan.filter(n=>S.hadith[n]).length,m=adhkarDone(k,'m'),e=adhkarDone(k,'e');
+  return{per,fard:fardCount(k),qTick,hN,hT:plan.length,m,e,
+    done:{salah:fardCount(k)===5,quran:qTick>=qTarget,hadith:plan.length>0&&hN===plan.length,adhkar:m&&e,tasbih:S.tasbih.items.every(x=>tDone(x,k))}};
 }
-function yScore(d,c){if(d.per&&(c==='salah'||c==='quran'))return 'p';
-  const v={salah:d.fard/5,quran:d.q,hadith:d.h,adhkar:d.ad};
-  if(c==='all'){const ks=d.per?['hadith','adhkar']:['salah','quran','hadith','adhkar'];return ks.reduce((a,x)=>a+v[x],0)/ks.length}
-  return v[c]}
-const yLvl=s=>s==='p'?'p':s<=0?'':s<.34?'l1':s<.67?'l2':s<1?'l3':'l4';
-async function viewYear(){
+async function viewMonth(){
   await meta();if(!ADHKAR)ADHKAR=await getJSON('adhkar.json');
-  const t=todayKey(),c=ui.ycat||'all';const last=t<END?t:END;
-  if(!ui.ysel||ui.ysel>last||ui.ysel<START)ui.ysel=t<START?null:last;
-  const months=[...Array(12)].map((_,i)=>{const d=parseKey(START);d.setMonth(d.getMonth()+i);return d});
-  let g='<span></span>'+months.map(m=>`<span class="mh">${m.toLocaleDateString('en-GB',{month:'narrow'})}</span>`).join('');
-  const days={};
-  for(let day=1;day<=31;day++){g+=`<span class="dn">${day}</span>`;
-    for(const m of months){const d=new Date(m.getFullYear(),m.getMonth(),day,12);
-      if(d.getMonth()!==m.getMonth()){g+='<span class="ypx x"></span>';continue}
-      const k=keyOf(d);if(k>last){g+='<span class="ypx f"></span>';continue}
-      const yd=days[k]=yearDay(k);
-      g+=`<button class="ypx ${yLvl(yScore(yd,c))} ${k===t?'t':''} ${k===ui.ysel?'sel':''}" data-act="ysel" data-v="${k}" aria-label="${fmtDate(k,{weekday:'long',day:'numeric',month:'long'})}"></button>`}}
-  const ks=Object.keys(days).sort();let full=0,best=0,cur=0;
-  for(const k of ks){const f=yScore(days[k],'all')>=1;if(f)full++;if(f||days[k].per){cur++;best=Math.max(best,cur)}else cur=0}
-  const hadRead=Object.keys(S.hadith).length,pages=Object.keys(S.quran.pages).length;
-  let detail='';
-  if(ui.ysel&&days[ui.ysel]){const d=days[ui.ysel];const y=(b,txt,f)=>`<span>${txt}</span><span class="${b?'ok':'no'}">${b?'✓ '+(f||'Done'):(f||'Not done')}</span>`;
-    detail=`<div class="card" style="display:flex;flex-direction:column;gap:8px"><h3>${fmtDate(ui.ysel,{weekday:'long',day:'numeric',month:'long'})}</h3><div class="small muted" style="margin-top:-6px">${hijriText(ui.ysel)}</div>
-      <div class="yrows">${d.per?`<span>Salah · Quran</span><span class="no">Period day</span>`:y(d.fard===5,'Fard salah',d.fard+'/5')+y(d.q>=1,'Quran',d.qTick+' page'+(d.qTick===1?'':'s'))+y(d.tah,'Tahajjud')}
-      ${y(d.hT&&d.hN===d.hT,'Hadith',d.hN+'/'+d.hT)}${y(d.m,'Morning adhkar')}${y(d.e,'Evening adhkar')}${d.z===null?'':y(d.z,'Manzil')}${y(d.hz,'Hizbul Azam')}${y(d.tas,'All tasbih targets')}</div></div>`}
+  const t=todayKey(),last=t<END?t:END;
+  if(!ui.mview)ui.mview=(t<START?START:last).slice(0,7);
+  const [y,mo]=ui.mview.split('-').map(Number),dim=new Date(y,mo,0).getDate(),lead=(new Date(y,mo-1,1).getDay()+6)%7;
+  const k1=ui.mview+'-01',kN=ui.mview+'-'+String(dim).padStart(2,'0');
+  if(!ui.msel||ui.msel.slice(0,7)!==ui.mview)ui.msel=(t>=k1&&t<=kN&&t>=START)?t:null;
+  const ha=hijriOf(k1),hb=hijriOf(kN);
+  const hname=(ha.m===hb.m?'':HM[ha.m-1]+(ha.y!==hb.y?' '+ha.y:'')+' – ')+HM[hb.m-1]+' '+hb.y+' AH';
+  const days={};let g='';for(let i=0;i<lead;i++)g+='<span class="mday empty"></span>';
+  for(let n=1;n<=dim;n++){const k=ui.mview+'-'+String(n).padStart(2,'0'),fut=k>last||k<START;
+    const d=fut?null:(days[k]=monthDay(k));
+    const dots=MH.map(([id])=>{const hide=d&&d.per&&(id==='salah'||id==='quran');return `<i style="${hide?'visibility:hidden':(d&&d.done[id]?`background:var(--h-${id})`:'')}"></i>`}).join('');
+    g+=`<button class="mday ${d&&d.per?'per':''} ${k===t?'today':''} ${k===ui.msel?'sel':''} ${fut?'future':''}" ${fut?'disabled':''} data-act="msel" data-v="${k}" aria-label="${fmtDate(k,{weekday:'long',day:'numeric',month:'long'})}"><span class="n">${n}</span><span class="dots">${dots}</span></button>`}
+  const yes=(b,txt,v,id)=>`<span>${txt}</span><span class="${b?'ok':'no'}" style="${b?`color:var(--h-${id})`:''}">${v}</span>`;
+  let detail='';const d=ui.msel&&days[ui.msel];
+  if(d)detail=`<div class="card"><h3>${fmtDate(ui.msel,{weekday:'long',day:'numeric',month:'long'})}</h3><div class="small muted">${hijriText(ui.msel)}</div>
+    <div class="yrows" style="margin-top:10px">${d.per?'<span>Salah · Quran</span><span class="no">Period day</span>':yes(d.done.salah,'Fard salah',d.fard+'/5','salah')+yes(d.done.quran,'Quran',d.qTick+' page'+(d.qTick===1?'':'s'),'quran')}
+    ${yes(d.done.hadith,'Hadith',d.hN+'/'+d.hT,'hadith')}${yes(d.m,'Morning adhkar',d.m?'✓ Done':'Not done','adhkar')}${yes(d.e,'Evening adhkar',d.e?'✓ Done':'Not done','adhkar')}${yes(d.done.tasbih,'Tasbih targets',d.done.tasbih?'✓ All done':'Not all done','tasbih')}</div></div>`;
+  const ks=Object.keys(days);
+  const sum=ks.length?MH.map(([id,l])=>{const pool=ks.filter(k=>!(days[k].per&&(id==='salah'||id==='quran'))),n=pool.filter(k=>days[k].done[id]).length;
+    return `<span>${l}</span><b class="tnum">${n}/${pool.length} days</b><div class="mbar"><i style="width:${pool.length?n/pool.length*100:0}%;background:var(--h-${id})"></i></div>`}).join(''):'<span class="no">Nothing recorded yet.</span>';
+  const prevOk=k1>START,nextOk=kN<END;
   return `<section class="view">
-   <div class="daynav"><button class="iconbtn" data-act="tab" data-v="home" aria-label="Back">${ICON.left}</button><div style="text-align:center"><h2>Year View</h2><div class="small muted">1 Nov 2026 – 31 Oct 2027</div></div><span style="width:40px"></span></div>
-   <div class="card stats4"><div><span>Full days</span><b class="tnum">${full}</b></div><div><span>Streak</span><b class="tnum">${best}</b></div><div><span>Hadith</span><b class="tnum">${hadRead.toLocaleString()}</b></div><div><span>Pages</span><b class="tnum">${pages}</b></div></div>
-   ${t<START?`<div class="banner">Your year starts on ${fmtDate(START,{weekday:'long',day:'numeric',month:'long'})}. Each day's square fills in from what you tick.</div>`:''}
-   <div class="hzday">${YCATS.map(([v,l])=>`<button data-act="ycat" data-v="${v}" aria-pressed="${c===v}">${l}</button>`).join('')}</div>
-   <div class="card" style="padding:12px"><div class="yg">${g}</div></div>
-   <div class="ylegend"><span>Less <i class="ypx" style="width:13px;display:inline-block"></i><i class="ypx l1" style="width:13px;display:inline-block"></i><i class="ypx l2" style="width:13px;display:inline-block"></i><i class="ypx l3" style="width:13px;display:inline-block"></i><i class="ypx l4" style="width:13px;display:inline-block"></i> All done</span><span><i style="background:var(--ypd)"></i>Period day</span><span><i style="box-shadow:inset 0 0 0 1px var(--line)"></i>Still to come</span></div>
+   <div class="daynav"><button class="iconbtn" data-act="tab" data-v="home" aria-label="Back">${ICON.left}</button><div style="text-align:center"><h2>Month View</h2></div><span style="width:40px"></span></div>
+   ${t<START?`<div class="banner">Your year starts on ${fmtDate(START,{weekday:'long',day:'numeric',month:'long'})}. Days fill in from what you tick.</div>`:''}
+   <div class="card"><div class="row between"><button class="iconbtn" data-act="mnav" data-v="-1" aria-label="Previous month" ${prevOk?'':'disabled'}>${ICON.left}</button>
+     <div style="text-align:center"><h2>${new Date(y,mo-1,1,12).toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</h2><div class="small muted">${hname}</div></div>
+     <button class="iconbtn" data-act="mnav" data-v="1" aria-label="Next month" ${nextOk?'':'disabled'}>${ICON.right}</button></div>
+     <div class="mwk"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="mcal">${g}</div></div>
+   <div class="mlegend">${MH.map(([id,l])=>`<span><i style="background:var(--h-${id})"></i>${l}</span>`).join('')}<span><i style="background:var(--rose-soft);outline:1px solid var(--rose)"></i>Period day</span></div>
    ${detail}
+   <div class="card"><div class="eyebrow" style="margin-bottom:10px">This month</div><div class="msum">${sum}</div></div>
   </section>`;
 }
 
@@ -671,6 +676,45 @@ async function viewTasbih(){
      <div class="row between small" style="width:100%"><span class="muted">Target ×${x.target.toLocaleString()} · All-time <b class="tnum">${life.toLocaleString()}</b></span><b class="tnum" style="color:${c>=x.target?'var(--done)':'var(--gold)'}">Today · ${c.toLocaleString()}</b></div></button>`}).join('')}
    <button class="btn ghost" data-act="tadd">+ Add your own</button></section>`;
 }
+const DUROOD=[
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ النَّبِيِّ الْأُمِّيِّ وَعَلٰى آلِهٖ وَسَلِّمْ تَسْلِيْمًا",when:"80 times after ʿAṣr on Friday, before getting up",en:"80 years of sins forgiven and 80 years of worship written for you.",src:"Dāraquṭnī, al-Qawl al-Badīʿ",gr:"Weak"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ عَبْدِكَ وَنَبِيِّكَ وَرَسُوْلِكَ النَّبِيِّ الْأُمِّيِّ",when:"80 times on Friday",en:"80 years of sins forgiven.",src:"al-Khaṭīb al-Baghdādī",gr:"Ḥasan (al-ʿIrāqī)"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَأَنْزِلْهُ الْمَقْعَدَ الْمُقَرَّبَ عِنْدَكَ يَوْمَ الْقِيَامَةِ",en:"His ﷺ intercession becomes certain for you.",src:"Aḥmad, Ṭabarānī",gr:"Chain fine (Ibn Kathīr)"},
+{ar:"جَزَى اللّٰهُ عَنَّا مُحَمَّدًا مَا هُوَ أَهْلُهٗ",en:"70 angel scribes are kept busy writing its reward for 1,000 mornings.",src:"Ṭabarānī, al-Muʿjam al-Kabīr",gr:"Weak"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ عَبْدِكَ وَرَسُوْلِكَ، وَصَلِّ عَلَى الْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ، وَالْمُسْلِمِيْنَ وَالْمُسْلِمَاتِ",when:"Said in your dua",en:"For someone who has no charity to give, it counts as charity (zakāh) for them.",src:"Ibn Ḥibbān",gr:"In Ṣaḥīḥ Ibn Ḥibbān"},
+{ar:"اَللّٰهُمَّ صَلِّ وَسَلِّمْ عَلٰى نَبِيِّنَا مُحَمَّدٍ",when:"10 times in the morning and 10 in the evening",en:"His ﷺ intercession will reach you on the Day of Judgement.",src:"Ṭabarānī",gr:"One chain good (Haythamī)"},
+{ar:"اَلسَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللّٰهِ وَبَرَكَاتُهٗ",en:"Allah returns his soul to him ﷺ so that he replies to your salām himself.",src:"Abū Dāwūd 2041",gr:"Ḥasan"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ النَّبِيِّ وَأَزْوَاجِهٖ أُمَّهَاتِ الْمُؤْمِنِيْنَ وَذُرِّيَّتِهٖ وَأَهْلِ بَيْتِهٖ كَمَا صَلَّيْتَ عَلٰى آلِ إِبْرَاهِيْمَ إِنَّكَ حَمِيْدٌ مَجِيْدٌ",en:"Your reward is weighed out in the fullest measure.",src:"Abū Dāwūd 982",gr:"Fine to quote (HadithAnswers)"},
+{ar:"صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ",when:"Write it in full after his name ﷺ, today and always",en:"The angels keep seeking forgiveness for you as long as his name stays in that writing.",src:"Ṭabarānī, al-Awsaṭ",gr:"Weak"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ",when:"50 times today",en:"He ﷺ will shake your hand on the Day of Judgement.",src:"Ibn Bashkuwāl, al-Qurbah",gr:"Weak"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ",when:"100 times after Fajr before speaking, and 100 after Maghrib",en:"100 needs fulfilled: 30 in this world and 70 in the Hereafter.",src:"Jalāʾ al-Afhām",gr:"Weak"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِهٖ وَصَحْبِهٖ وَسَلِّمْ",when:"In every gathering before it ends",any:1,en:"That gathering will not become a regret for you on the Day of Judgement.",src:"Tirmidhī 3380",gr:"Ḥasan ṣaḥīḥ"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ",when:"100 times on Friday",any:1,en:"A light comes with you on the Day of Judgement so great that, if shared out, it would cover all creation.",src:"Abū Nuʿaym, Ḥilyah",gr:"Gharīb (unverified)"},
+{ar:"صَلَّى اللّٰهُ عَلٰى مُحَمَّدٍ",when:"1,000 times in a day",en:"You won't die until you are shown your place in Paradise.",src:"Ibn Shāhīn and others",gr:"Very weak; scholars allow acting on it"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ",ar2:"ذَكَرَ اللّٰهُ بِخَيْرٍ مَنْ ذَكَرَنِيْ",when:"When your ear rings: durood, then this",any:1,en:"His ﷺ own teaching for when your ear rings.",src:"Ṭabarānī, al-Kabīr",gr:"Ḥasan (Haythamī)"},
+{ar:"اَللّٰهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلٰى سَيِّدِنَا مُحَمَّدٍ",when:"When you forget something",any:1,en:"You'll remember it, in shāʾ Allāh.",src:"Abū Mūsā al-Madīnī",gr:"Weak"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ",when:"After repeating the adhān: durood, then the dua for al-Wasīlah",any:1,en:"Allah sends 10 blessings on you, and his ﷺ intercession becomes due for you.",src:"Muslim 384",gr:"Ṣaḥīḥ"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِهٖ وَصَحْبِهٖ وَسَلِّمْ",when:"Before your dua: praise Allah, then durood, then ask",any:1,en:"“Ask, and you will be answered.”",src:"Tirmidhī 3476",gr:"Ṣaḥīḥ"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى آلِ سَيِّدِنَا مُحَمَّدٍ",when:"Lots of it on Friday",any:1,en:"Your durood is presented to him ﷺ.",src:"Abū Dāwūd 1047",gr:"Ṣaḥīḥ"},
+{ar:"اَللّٰهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلٰى مُحَمَّدٍ",when:"Give your whole dua time to durood today",any:1,en:"Your worries will be taken care of and your sins forgiven.",src:"Tirmidhī 2457",gr:"Ḥasan"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِهٖ وَسَلِّمْ",en:"Forgiven before you stand up, or before you sit down if standing.",src:"Dalāʾil al-Khayrāt commentary (Anas)",gr:"Unverified"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ",when:"With every step you take",en:"A man in Ḥajj told Sufyān al-Thawrī his late father's darkened face was made bright by the Prophet ﷺ, because he used to send so much durood.",src:"Abū Nuʿaym (a story)",gr:"Story"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِهٖ أَلْفَ أَلْفِ مَرَّةٍ",en:"Hoped to be rewarded as if said a million times.",src:"Scholars, by analogy with Muslim 2726",gr:"Scholars' hope"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ بِعَدَدِ قَطَرَاتِ الْأَمْطَارِ",when:"When it rains",en:"A durood for every raindrop.",src:"Haytamī, ad-Durr al-Manḍūd",gr:"Scholars' practice"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَآلِهٖ وَصَحْبِهٖ وَسَلِّمْ بِعَدَدِ مَا فِيْ جَمِيْعِ الْقُرْآنِ حَرْفًا حَرْفًا، وَبِعَدَدِ كُلِّ حَرْفٍ أَلْفًا أَلْفًا",when:"After reciting Quran",en:"Blessing in this world and the next.",src:"Rūḥ al-Bayān",gr:"Scholars' practice"},
+{ar:"صَلَّى اللّٰهُ عَلٰى نَبِيِّنَا كُلَّمَا ذَكَرَهُ الذَّاكِرُوْنَ، وَغَفَلَ عَنْ ذِكْرِهِ الْغَافِلُوْنَ",en:"Imam al-Shāfiʿī was seen in a dream saying he was forgiven for this durood.",src:"ar-Risālah; Iḥyāʾ, Subkī",gr:"Dream"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ صَلَاةً تَقْضِيْ بِهَا حَاجَاتِنَا",when:"41 or 100 times, then ask for your need",en:"Needs fulfilled.",src:"Experience of the pious",gr:"Not a Sunnah form (HadithAnswers)"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَآلِ مُحَمَّدٍ بِعَدَدِ كُلِّ دَاءٍ وَدَوَاءٍ",en:"Protection from plague and illness.",src:"Rūḥ al-Bayān (a dream)",gr:"Dream"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ عَدَدَ مَا فِيْ عِلْمِ اللّٰهِ، صَلَاةً دَائِمَةً بِدَوَامِ مُلْكِ اللّٰهِ",en:"Said to equal 600,000 duroods.",src:"al-Ṣāwī",gr:"No chain"},
+{ar:"اَللّٰهُمَّ صَلِّ عَلٰى رُوْحِ مُحَمَّدٍ فِي الْأَرْوَاحِ، وَعَلٰى جَسَدِهٖ فِي الْأَجْسَادِ، وَعَلٰى قَبْرِهٖ فِي الْقُبُوْرِ",en:"Seeing him ﷺ in a dream.",src:"al-Qawl al-Badīʿ",gr:"No chain"}
+];
+function duroodToday(){const n=new Date().getDate();return{n,x:DUROOD[n===31?22:n-1]}}
+function duroodCard(){const {n,x}=duroodToday();
+  return `<div class="durcard"><div class="row between"><span class="eyebrow">Today's durood</span><span class="small muted">Day ${n} of the month</span></div>
+   ${x.when?`<div class="small" style="color:var(--gold);font-weight:600">${esc(x.when)}</div>`:''}
+   ${x.any?'<div class="small muted">Any durood works, for example:</div>':''}
+   <div class="ar">${esc(x.ar)}</div>${x.ar2?`<div class="ar">${esc(x.ar2)}</div>`:''}
+   <div style="font-size:15px">${esc(x.en)}</div><div class="small muted">${esc(x.src)} · ${esc(x.gr)}</div></div>`}
 let counterId=null;
 function openCounter(id){counterId=id;drawCounter()}
 function drawCounter(){const x=S.tasbih.items.find(i=>i.id===counterId);if(!x){document.getElementById('overlay').innerHTML='';return}
@@ -679,7 +723,7 @@ function drawCounter(){const x=S.tasbih.items.find(i=>i.id===counterId);if(!x){d
     return `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${i===act?12:10}" fill="${i===act?'var(--sky-3)':(on?'var(--accent)':'var(--card)')}" stroke="${i===act?'var(--gold)':'var(--line)'}" stroke-width="${i===act?3:1.5}"/>`}).join('');
   document.getElementById('overlay').innerHTML=`<div class="counter" role="dialog" aria-label="${esc(x.name)} counter">
    <div class="row between"><button class="iconbtn" data-act="tclose" aria-label="Back">${ICON.left}</button><div class="small muted" style="text-align:center;flex:1">${x.split?SESS[sk]+' · ':''}Target ×${x.target.toLocaleString()}</div><div class="row" style="gap:6px"><button class="btn ghost small" data-act="tadd1">+ Add</button><button class="btn ghost small" data-act="tundo">−1</button></div></div>
-   <div style="margin-top:10px">${x.ar?tName(x):`<h2 style="text-align:center">${esc(x.name)}</h2>`}</div>
+   <div style="margin-top:10px">${x.ar?tName(x):`<h2 style="text-align:center">${esc(x.name)}</h2>`}</div>${x.id==='dur'?duroodCard():''}
    <div class="ring" data-act="tinc"><div class="beads"><svg viewBox="0 0 360 360" aria-hidden="true"><circle cx="180" cy="180" r="${R}" fill="none" stroke="var(--line)" stroke-width="2"/>${beads}</svg>
      <div class="num"><div><b class="tnum">${c.toLocaleString()}</b><span class="muted tnum">/ ${x.target.toLocaleString()}</span>${c>=x.target?'<div class="status ok" style="margin-top:8px">Target reached</div>':''}</div></div></div></div>
    <p class="small muted" style="text-align:center;margin:0">Tap anywhere on the beads to count. Keeps counting past the target.</p>
@@ -754,9 +798,9 @@ document.addEventListener('click',async e=>{
        if(dn===list.length)toast(w==='m'?'Morning adhkar complete':'Evening adhkar complete');}
      break}
    case 'areset':{const d=adhkarDay(t);d[ui.adhkar]={};save();render();break}
-   case 'year':setTab('year');break;
-   case 'ycat':ui.ycat=v;render();break;
-   case 'ysel':ui.ysel=v;await render();document.querySelector('.yrows')?.closest('.card').scrollIntoView({behavior:'smooth',block:'nearest'});break;
+   case 'month':ui.mview=null;ui.msel=null;setTab('month');break;
+   case 'mnav':{const [yy,mm]=ui.mview.split('-').map(Number),nd=new Date(yy,mm-1+(+v),1,12);ui.mview=keyOf(nd).slice(0,7);ui.msel=null;render();break}
+   case 'msel':ui.msel=v;await render();document.querySelector('.yrows')?.closest('.card').scrollIntoView({behavior:'smooth',block:'nearest'});break;
    case 'hzday':ui.hz=v;scrollTo(0,0);render();break;
    case 'hizb':{const d=adhkarDay(t);d.hz=!d.hz;d.hzd={};if(d.hz)for(const n of (S._hzduas||[]))d.hzd[n]=1;save();render();break}
    case 'manzil':{const d=adhkarDay(t);d.z=!d.z;d.zp={};if(d.z)MANZIL.forEach((_,i)=>d.zp[i]=1);save();render();break}
@@ -797,7 +841,7 @@ async function updateHadithHead(){const m=await meta();const list=m.plan[ui.hDay
   const c=document.getElementById('hcount'),b=document.getElementById('hbar');if(c)c.textContent=`${r} of ${list.length}`;if(b)b.style.width=(r/list.length*100)+'%';}
 
 /* ---------- boot ---------- */
-const VIEWS={home:viewHome,hadith:viewHadith,quran:viewQuran,salah:viewSalah,adhkar:viewAdhkar,tasbih:viewTasbih,year:viewYear};
+const VIEWS={home:viewHome,hadith:viewHadith,quran:viewQuran,salah:viewSalah,adhkar:viewAdhkar,tasbih:viewTasbih,month:viewMonth};
 load();applySky();
 const h=location.hash.slice(1);if(VIEWS[h])tab=h;
 render();
