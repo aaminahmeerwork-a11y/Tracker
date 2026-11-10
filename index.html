@@ -379,19 +379,23 @@ function quranExpected(upto){
   return Math.min(QURAN_PAGES,exp);
 }
 function quranStatus(){
-  const read=Object.keys(S.quran.pages).length;const exp=quranExpected();
-  const target=Math.ceil(exp-1e-9);const todayNeed=Math.max(0,target-read);
+  const t=todayKey(),y=addDays(t,-1),vals=Object.values(S.quran.pages);
+  const read=vals.length,readToday=vals.filter(d=>d===t).length,readBefore=read-readToday;
+  const expY=quranExpected(y),expT=quranExpected(t);
+  const dueY=Math.ceil(expY-1e-9),dueT=Math.ceil(expT-1e-9);
+  const share=isPeriod(t)?0:Math.max(0,dueT-dueY),behind0=Math.max(0,dueY-readBefore);
+  const target=t<START?0:Math.min(QURAN_PAGES-readBefore,share+behind0);
   let first=1;while(first<=QURAN_PAGES&&S.quran.pages[first])first++;
-  const due=Math.ceil(quranExpected(addDays(todayKey(),-1))-1e-9);
-  return{read,exp,target,todayNeed,first,diff:read<due?read-due:Math.max(0,read-target)};
+  return{read,readToday,share,behind0,target,todayNeed:Math.max(0,target-readToday),first,rate:expT-expY,
+    diff:read<dueY?read-dueY:Math.max(0,read-dueT)};
 }
-function todayBlock(qs){const t=todayKey();const b=S.quran.today;
-  if(t<START){const n=Math.max(1,Math.ceil(quranExpected(START)-1e-9));return{k:t,from:1,n,pre:true}}
-  if(!b||b.k!==t){S.quran.today={k:t,from:qs.first,n:Math.max(1,qs.todayNeed)};if(!isPeriod(t)){S.quran.log=S.quran.log||{};S.quran.log[t]=S.quran.today.n}save()}
-  return S.quran.today;}
-function quranToday(){const qs=quranStatus(),tb=todayBlock(qs);const to=Math.min(QURAN_PAGES,tb.from+tb.n-1);
-  let done=0;for(let k=tb.from;k<=to;k++)if(S.quran.pages[k])done++;
-  return{qs,tb,from:tb.from,to,n:to-tb.from+1,done,range:tb.from===to?`page ${tb.from}`:`pages ${tb.from}–${to}`}}
+function quranToday(){const qs=quranStatus(),t=todayKey();
+  if(t<START){const n=Math.max(1,Math.ceil(quranExpected(START)-1e-9));return{qs,tb:{pre:true},from:1,to:n,n,done:0,range:n===1?'page 1':`pages 1–${n}`}}
+  if(!isPeriod(t)){S.quran.log=S.quran.log||{};if(S.quran.log[t]!==qs.target){S.quran.log[t]=qs.target;save()}}
+  let from=qs.first;for(const k in S.quran.pages)if(S.quran.pages[k]===t&&+k<from)from=+k;
+  let to=from-1,got=0;for(let k=from;k<=QURAN_PAGES&&got<qs.target;k++){if(!S.quran.pages[k]||S.quran.pages[k]===t){got++;to=k}}
+  if(to<from)to=from;
+  return{qs,tb:{pre:false},from,to,n:qs.target,done:qs.readToday,range:from===to?`page ${from}`:`pages ${from}–${to}`}}
 function adhkarDay(k){return S.adhkar[k]||(S.adhkar[k]={m:{},e:{},z:false})}
 function adhkarDone(k,which){if(!ADHKAR)return false;const d=S.adhkar[k];if(!d)return false;const list=ADHKAR[which==='m'?'morning':'evening'];return list.every((x,i)=>(d[which][i]||0)>=x.n)}
 function salahDay(k){return S.salah[k]||(S.salah[k]={})}
@@ -512,15 +516,16 @@ async function viewQuran(){
   const Q=await quran(),qs=quranStatus();
   if(qs.read>=QURAN_PAGES) return `<section class="view"><div class="card paused"><div class="eyebrow">Khatam</div><h2 style="margin:8px 0">You've completed the Quran${S.quran.khatam?` (${S.quran.khatam+1})`:''}</h2><p class="muted">May Allah accept it from you.</p><button class="btn" data-act="newkhatam">Start a new khatam</button></div></section>`;
   const QT=quranToday(),tb=QT.tb;let pages=[];
-  if(ui.qPage===null){for(let k=QT.from;k<=QT.to;k++)pages.push(k);
+  if(ui.qPage===null){for(let k=QT.from;k<=QT.to;k++)if(!S.quran.pages[k]||S.quran.pages[k]===t)pages.push(k);
     if(pages.every(k=>S.quran.pages[k])&&!tb.pre){let k=qs.first;pages=k<=QURAN_PAGES?[k]:[]}}
   else pages=[ui.qPage];
   const p=pages[0]||qs.first;
-  const allDone=QT.done>=QT.n;
+  const allDone=QT.done>=QT.n&&QT.n>0;
   return `<section class="view">
    <div class="card"><div class="row between" style="align-items:flex-start"><div><span class="eyebrow">${tb.pre?`Starts ${fmtDate(START,{weekday:'long'})}`:'Today'}</span>
       <div style="font-family:var(--f-display);font-size:24px;font-weight:600;line-height:1.2;margin-top:2px">${QT.range.charAt(0).toUpperCase()+QT.range.slice(1)}</div>
-      <div class="small muted">${allDone&&!tb.pre?'Done for today, alhamdulillah. Read on if you like':`${QT.done} of ${QT.n} done`} · about 2–3 pages a day</div></div>${tb.pre?'':statusPill(qs.diff,'pages')}</div>
+      <div class="small muted">${allDone&&!tb.pre?'Done for today, alhamdulillah. Read on if you like':`${QT.done} of ${QT.n} read today`}${!tb.pre&&qs.behind0?` (${qs.share} for today + ${qs.behind0} catch-up)`:''}</div>
+      ${tb.pre?'':`<div class="small muted">Rate to finish by 31 Oct 2027: ${qs.rate.toFixed(1)} pages a day on reading days</div>`}</div>${tb.pre?'':statusPill(qs.diff,'pages')}</div>
     <div class="progress" style="margin-top:12px"><i style="width:${qs.read/604*100}%"></i></div>
     <div class="row between small muted" style="margin-top:6px"><span>${qs.read} of 604 pages</span><span>Ends 31 Oct 2027</span></div></div>
    <div class="daynav"><button class="iconbtn" data-act="qpage" data-v="-1" aria-label="Previous page" ${p<=1?'disabled':''}>${ICON.left}</button>

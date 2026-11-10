@@ -1,7 +1,7 @@
 // Tracker offline support.
 // Every update downloads fresh copies (never the phone's short-term web cache),
 // and the app page plus its small data files are always checked online first.
-const VERSION='tracker-7';
+const VERSION='tracker-9';
 const CORE=["./", "adhkar.json", "amiri-400.woff2", "amiri-700.woff2", "apple-touch-icon.png", "figtree-400.woff2", "figtree-500.woff2", "figtree-600.woff2", "figtree-700.woff2", "hadith-meta.json", "hafs.ttf", "icon-192.png", "icon-512.png", "icon-maskable.png", "index.html", "lwa.json", "manifest.webmanifest", "manzil.json", "newsreader-400i.woff2", "newsreader-500.woff2", "newsreader-600.woff2", "quran.json", "hizb-index.json", "hadith-sanad.json"];
 const LATER=["hadith-01.json", "hadith-02.json", "hadith-03.json", "hadith-04.json", "hadith-05.json", "hadith-06.json", "hadith-07.json", "hadith-08.json", "hadith-09.json", "hadith-10.json", "hadith-11.json", "hadith-12.json", "hizb-sat.bin", "hizb-sun.bin", "hizb-mon.bin", "hizb-tue.bin", "hizb-wed.bin", "hizb-thu.bin", "hizb-fri.bin"];
 const FRESH_FIRST=["./", "index.html", "adhkar.json", "hadith-meta.json", "hadith-sanad.json", "hizb-index.json", "manzil.json", "lwa.json", "manifest.webmanifest"];
