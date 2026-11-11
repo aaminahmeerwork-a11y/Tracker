@@ -231,13 +231,13 @@ const SALAH=[
  {id:'isha',name:'Isha',parts:[['s1',4,'Sunnah'],['f',4,'Fard'],['s2',2,'Sunnah'],['n1',2,'Nafl',1],['w',3,'Witr'],['n2',2,'Nafl',1]]},
 ];
 const DEFAULT_TASBIH=[
- {id:'k1',name:'1st Kalimah',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَّسُوْلُ اللّٰهِ',target:100},
- {id:'k3',name:'3rd Kalimah',ar:'سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ',target:100},
- {id:'ist',name:'Istighfar',ar:'استغفار',target:100},
  {id:'dur',name:'Durood',ar:'درود',target:300},
+ {id:'k1',name:'1st Kalimah',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ مُحَمَّدٌ رَّسُوْلُ اللّٰهِ',target:100},
+ {id:'ist',name:'Istighfar',ar:'استغفار',target:100},
  {id:'sbh',name:'SubhanAllahi wa bihamdihi',ar:'سُبْحَانَ اللّٰهِ وَبِحَمْدِهٖ',target:100},
  {id:'tah',name:'La ilaha illallah wahdahu',ar:'لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهٗ لَا شَرِيْكَ لَهٗ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ',target:100},
  {id:'tak',name:'SubhanAllah, Alhamdulillah, Allahu Akbar',ar:'سُبْحَانَ اللّٰهِ، اَلْحَمْدُ لِلّٰهِ، اَللّٰهُ أَكْبَرُ',target:100,split:true},
+ {id:'k3',name:'3rd Kalimah',ar:'سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيْمِ',target:100},
 ];
 const sessNow=()=>new Date().getHours()<12?'m':'e';
 const SESS={m:'Morning',e:'Evening'};
@@ -274,6 +274,7 @@ function load(){try{const raw=localStorage.getItem(STORE);S=raw?JSON.parse(raw):
   const f=fresh();for(const k in f) if(S[k]===undefined) S[k]=f[k];
   if(!S.hijri) S.hijri=initHijri();
   for(const d of DEFAULT_TASBIH){const it=S.tasbih.items.find(i=>i.id===d.id);if(!it)S.tasbih.items.push({...d});else{it.ar=d.ar;it.target=d.target;it.split=!!d.split}}
+  {const ord=DEFAULT_TASBIH.map(d=>d.id),ix=i=>{const j=ord.indexOf(i.id);return j<0?99:j};S.tasbih.items.sort((x,y)=>ix(x)-ix(y))}
   if(!S.tasbih.sess) S.tasbih.sess={};
   if(!S.quran.log) S.quran.log={};}
 let saveT;
@@ -361,15 +362,26 @@ async function quran(){if(QURAN)return QURAN;const q=await getJSON('quran.json')
 
 /* ---------- plan maths ---------- */
 const planDay=()=>diffDays(START,todayKey()); // 0 on 1 Nov
+const H_END='2028-10-31',H_MAX_BEHIND=25;let HORDER=null,HLOC=null;
+function hOrder(){if(!HORDER){HORDER=META.plan.flat();HLOC={};META.plan.forEach((d,i)=>d.forEach((n,j)=>HLOC[n]=[i,j]))}return HORDER}
+async function getHadiths(nums){const m=await meta();hOrder();const out=[];
+  for(const n of nums){const [d,j]=HLOC[n];const ch=await getJSON(`hadith-${pad(Math.floor(d/m.chunk)+1)}.json`);out.push(ch[d%m.chunk][j])}return out}
 function hadithStatus(){
   if(!META) return null;
-  const i=Math.min(planDay(),PLAN_DAYS-1);let expected=0,read=0;
-  for(let d=0;d<i;d++) expected+=META.plan[d].length; // days before today
-  for(const n in S.hadith) read++;
-  const todayList=i>=0?META.plan[i]:META.plan[0];
-  const todayRead=todayList.filter(n=>S.hadith[n]).length;
-  const readNotToday=read-(i>=0?todayRead:0);
-  return{i,expected:i<0?0:expected,read,diff:(()=>{if(i<0)return 0;let un=0,fut=0;for(let d=0;d<i;d++)for(const n of META.plan[d])if(!S.hadith[n])un++;for(let d=i+1;d<PLAN_DAYS;d++)for(const n of META.plan[d])if(S.hadith[n])fut++;return un?-un:fut})(),todayTotal:todayList.length,todayRead,total:META.total};
+  const t=todayKey(),vals=Object.values(S.hadith),total=META.total;
+  const read=vals.length,readToday=vals.filter(v=>v===t).length,readBefore=read-readToday;
+  const plan=()=>{S.hplan={k:t,base:readBefore,rate:(total-readBefore)/(diffDays(t,H_END)+1)};save()};
+  if(!S.hplan)plan();
+  const calc=()=>{const P=S.hplan,i=diffDays(P.k,t);return[Math.ceil(P.base+P.rate*i-1e-9),Math.ceil(P.base+P.rate*(i+1)-1e-9)]};
+  let [dueY,dueT]=calc();
+  if(dueY-readBefore>H_MAX_BEHIND){plan();[dueY,dueT]=calc()}
+  const behind=Math.max(0,dueY-readBefore),share=Math.max(0,dueT-dueY);
+  const target=Math.min(total-readBefore,share+behind);
+  S.hlog=S.hlog||{};if(S.hlog[t]!==target){S.hlog[t]=target;save()}
+  const list=[];let need=target-readToday;
+  for(const n of hOrder()){if(S.hadith[n]===t)list.push(n);else if(!S.hadith[n]&&need>0){list.push(n);need--}}
+  return{read,readToday,todayRead:readToday,todayTotal:target,target,share,behind,list,total,
+    diff:read<dueY?read-dueY:Math.max(0,read-dueT)};
 }
 function quranExpected(upto){
   const t=upto||todayKey();if(t<START)return 0;let exp=0;
@@ -420,7 +432,7 @@ function statusPill(diff,unit){if(diff>=0)return `<span class="status ok">${diff
 /* ---------- router ---------- */
 const TABS=[['home','Home'],['salah','Salah'],['adhkar','Adhkar'],['quran','Quran'],['hadith','Hadith'],['tasbih','Tasbih']];
 let tab='home';const ui={hDay:null,hMode:'day',adhkar:null,salahDay:null,qPage:null};
-function setTab(t){tab=t;ui.hDay=null;ui.salahDay=null;scrollTo(0,0);render();try{history.replaceState(null,'','#'+t)}catch(e){}}
+function setTab(t){tab=t;ui.hDay=null;ui.hMore=0;ui.salahDay=null;scrollTo(0,0);render();try{history.replaceState(null,'','#'+t)}catch(e){}}
 function renderTabs(){document.getElementById('tabbar').innerHTML=TABS.map(([id,l])=>`<button data-act="tab" data-v="${id}" ${tab===id?'aria-current="page"':''}>${ICON[id]}<span>${l}</span></button>`).join('')}
 async function render(){renderTabs();const el=document.getElementById('app');
   try{el.innerHTML=await VIEWS[tab]()}catch(e){console.error(e);el.innerHTML=`<div class="card">Something didn't load. Check your internet once, then reopen the app.<br><span class="small muted">${esc(e.message)}</span></div>`}}
@@ -459,7 +471,7 @@ async function viewHome(){
   <div class="grid2">
     <button class="card plan" data-act="tab" data-v="hadith"><div class="row between"><span class="eyebrow">Hadith</span>${ring(hFrac,36,4)}</div>
       <div class="big tnum">${hs.todayRead}<span class="muted" style="font-size:18px">/${hs.todayTotal}</span></div>
-      <div class="sub">${pd<0?`Starts ${fmtDate(START)}`:`Day ${Math.min(pd+1,365)} of 365`}</div>${pd>=0?statusPill(hs.diff,'hadith'):''}</button>
+      <div class="sub">Read today</div>${pd>=0?statusPill(hs.diff,'hadith'):''}</button>
     <button class="card plan" data-act="tab" data-v="quran"><div class="row between"><span class="eyebrow">Quran</span>${qPaused?'':ring(qFrac,36,4)}</div>
       <div class="big tnum">${QT.done}<span class="muted" style="font-size:18px">/${QT.n}</span></div>
       <div class="sub">${qPaused?'Paused (period days)':(QT.tb.pre?`Starts ${fmtDate(START)}: ${QT.range}`:`Today: ${QT.range}`)}</div>${t>=START&&!qPaused?statusPill(qs.diff,'pages'):''}</button>
@@ -475,31 +487,16 @@ async function viewHome(){
 
 /* ---------- HADITH ---------- */
 async function viewHadith(){
-  const m=await meta();const pd=planDay();
-  if(ui.hDay===null) ui.hDay=Math.max(0,Math.min(pd,PLAN_DAYS-1));
-  const hs=hadithStatus();
-  if(ui.hMode==='catch'){
-    const upto=Math.min(pd,PLAN_DAYS);const nums=[];for(let d=0;d<upto;d++)for(const n of m.plan[d]) if(!S.hadith[n]) nums.push([d,n]);
-    const days=[...new Set(nums.map(x=>x[0]))];const items=[];
-    for(const d of days.slice(0,10)){const list=await hadithDay(d);for(const h of list) if(!S.hadith[h.n]) items.push([d,h])}
-    return `<section class="view"><div class="row between"><h2>Catch up</h2><button class="btn ghost small" data-act="hmode" data-v="day">Back to today</button></div>
-      <p class="muted" style="margin:0">${nums.length} hadith left from earlier days.${days.length>10?' Showing the oldest 10 days first.':''}</p>
-      ${items.map(([d,h])=>hcard(h,d,m)).join('')||'<div class="card">All caught up, alhamdulillah.</div>'}</section>`;
-  }
-  const d=ui.hDay,list=await hadithDay(d),date=addDays(START,d);
-  const read=list.filter(h=>S.hadith[h.n]).length;
-  let earlier=0;for(let k=0;k<Math.min(pd,PLAN_DAYS);k++)for(const n of m.plan[k]) if(!S.hadith[n]) earlier++;
+  const m=await meta(),hs=hadithStatus();
+  const more=ui.hMore||0,extra=more?hOrder().filter(n=>!S.hadith[n]&&!hs.list.includes(n)).slice(0,more):[];
+  const list=await getHadiths(hs.list),ex=await getHadiths(extra);
+  const allDone=hs.readToday>=hs.target;
   return `<section class="view">
-   <div class="daynav"><button class="iconbtn" data-act="hday" data-v="-1" aria-label="Previous day" ${d<=0?'disabled':''}>${ICON.left}</button>
-     <div style="text-align:center"><h2>Day ${d+1} <span class="muted" style="font-size:16px">of 365</span></h2><div class="small muted">${fmtDate(date,{weekday:'long',day:'numeric',month:'long'})}${d===pd?' · today':''}</div></div>
-     <button class="iconbtn" data-act="hday" data-v="1" aria-label="Next day" ${d>=PLAN_DAYS-1?'disabled':''}>${ICON.right}</button></div>
-   ${pd<0&&d===0?`<div class="banner">Your plan starts on ${fmtDate(START,{weekday:'long',day:'numeric',month:'long'})}. You can read ahead, and ticks will count.</div>`:''}
-   <div class="card"><div class="row between"><div><b class="tnum" id="hcount">${read} of ${list.length}</b> <span class="muted small">read on this day</span></div>${pd>=0?statusPill(hs.diff,'hadith'):''}</div>
-     <div class="progress" style="margin:10px 0 12px"><i id="hbar" style="width:${list.length?read/list.length*100:0}%"></i></div>
-     <div class="row" style="flex-wrap:wrap"><button class="btn small" data-act="hall" data-v="${d}">Mark all read</button>
-     ${earlier&&d===Math.max(0,Math.min(pd,PLAN_DAYS-1))?`<button class="btn ghost small" data-act="hmode" data-v="catch">${earlier} from earlier days</button>`:''}</div></div>
-   ${list.map(h=>hcard(h,d,m)).join('')}
-   <button class="btn ghost" data-act="hall" data-v="${d}">Mark all read</button>
+   <div class="card"><div class="row between"><div><b class="tnum" id="hcount">${hs.readToday} of ${hs.target}</b> <span class="muted small">read today</span></div><span id="hpill">${statusPill(hs.diff,'hadith')}</span></div>
+     <div class="progress" style="margin:10px 0 12px"><i id="hbar" style="width:${hs.target?Math.min(1,hs.readToday/hs.target)*100:0}%"></i></div>
+     <button class="btn small" data-act="hall">Mark all read</button></div>
+   ${list.map(h=>hcard(h,0,m)).join('')}${ex.map(h=>hcard(h,0,m)).join('')}
+   <button class="btn ghost" data-act="hmore">Read 5 more</button>
   </section>`;
 }
 function hcard(h,d,m){const done=!!S.hadith[h.n];const book=m.sections[String(h.b)]||'';
@@ -524,10 +521,9 @@ async function viewQuran(){
   return `<section class="view">
    <div class="card"><div class="row between" style="align-items:flex-start"><div><span class="eyebrow">${tb.pre?`Starts ${fmtDate(START,{weekday:'long'})}`:'Today'}</span>
       <div style="font-family:var(--f-display);font-size:24px;font-weight:600;line-height:1.2;margin-top:2px">${QT.range.charAt(0).toUpperCase()+QT.range.slice(1)}</div>
-      <div class="small muted">${allDone&&!tb.pre?'Done for today, alhamdulillah. Read on if you like':`${QT.done} of ${QT.n} read today`}${!tb.pre&&qs.behind0?` (${qs.share} for today + ${qs.behind0} catch-up)`:''}</div>
-      ${tb.pre?'':`<div class="small muted">Rate to finish by 31 Oct 2027: ${qs.rate.toFixed(1)} pages a day on reading days</div>`}</div>${tb.pre?'':statusPill(qs.diff,'pages')}</div>
+      <div class="small muted">${QT.done} of ${QT.n} read today</div></div>${tb.pre?'':statusPill(qs.diff,'pages')}</div>
     <div class="progress" style="margin-top:12px"><i style="width:${qs.read/604*100}%"></i></div>
-    <div class="row between small muted" style="margin-top:6px"><span>${qs.read} of 604 pages</span><span>Ends 31 Oct 2027</span></div></div>
+    <div class="small muted" style="margin-top:6px">${qs.read} / 604</div></div>
    <div class="daynav"><button class="iconbtn" data-act="qpage" data-v="-1" aria-label="Previous page" ${p<=1?'disabled':''}>${ICON.left}</button>
      <button class="pill" data-act="qjump">Page ${p}${pages.length>1?'–'+pages[pages.length-1]:''}</button>
      <button class="iconbtn" data-act="qpage" data-v="1" aria-label="Next page" ${pages[pages.length-1]>=QURAN_PAGES?'disabled':''}>${ICON.right}</button></div>
@@ -623,9 +619,9 @@ const MH=[['salah','Salah'],['quran','Quran'],['hadith','Hadith'],['adhkar','Adh
 function monthDay(k){
   const per=isPeriod(k),i=diffDays(START,k),plan=META.plan[i]||[];
   const qTick=Object.values(S.quran.pages).filter(d=>d===k).length,qTarget=(S.quran.log||{})[k]||2;
-  const hN=plan.filter(n=>S.hadith[n]).length,m=adhkarDone(k,'m'),e=adhkarDone(k,'e');
-  return{per,fard:fardCount(k),qTick,hN,hT:plan.length,m,e,
-    done:{salah:fardCount(k)===5,quran:qTick>=qTarget,hadith:plan.length>0&&hN===plan.length,adhkar:m&&e,tasbih:S.tasbih.items.every(x=>tDone(x,k))}};
+  const hl=(S.hlog||{})[k],hN=hl!=null?Object.values(S.hadith).filter(v=>v===k).length:plan.filter(n=>S.hadith[n]).length,hT=hl!=null?hl:plan.length,m=adhkarDone(k,'m'),e=adhkarDone(k,'e');
+  return{per,fard:fardCount(k),qTick,hN,hT,m,e,
+    done:{salah:fardCount(k)===5,quran:qTick>=qTarget,hadith:hT>0?hN>=hT:hl!=null,adhkar:m&&e,tasbih:S.tasbih.items.every(x=>tDone(x,k))}};
 }
 async function viewMonth(){
   await meta();if(!ADHKAR)ADHKAR=await getJSON('adhkar.json');
@@ -783,9 +779,10 @@ document.addEventListener('click',async e=>{
    case 'sday':{const n=addDays(ui.salahDay,+v);if(n<=t){ui.salahDay=n;render()}break}
    case 'hday':ui.hDay=Math.max(0,Math.min(PLAN_DAYS-1,ui.hDay+ +v));scrollTo(0,0);render();break;
    case 'hmode':ui.hMode=v;scrollTo(0,0);render();break;
-   case 'htick':{const n=v;if(S.hadith[n])delete S.hadith[n];else S.hadith[n]=1;buzz(10);save();
+   case 'htick':{const n=v;if(S.hadith[n])delete S.hadith[n];else S.hadith[n]=todayKey();buzz(10);save();
      const card=el.closest('.hcard');card.classList.toggle('is-done',!!S.hadith[n]);el.setAttribute('aria-pressed',!!S.hadith[n]);updateHadithHead();break}
-   case 'hall':{const m=await meta();for(const n of m.plan[+v])S.hadith[n]=1;buzz(20);save();toast('Marked all read');render();break}
+   case 'hmore':ui.hMore=(ui.hMore||0)+5;render();break;
+   case 'hall':{const t2=todayKey();for(const n of hadithStatus().list)if(!S.hadith[n])S.hadith[n]=t2;buzz(20);save();toast('Marked all read');render();break}
    case 'qtick':{const k=+v,y=scrollY;if(S.quran.pages[k])delete S.quran.pages[k];else{S.quran.pages[k]=t;}buzz(15);save();
      if(S.quran.pages[k]&&quranStatus().todayNeed===0)toast('Done for today, alhamdulillah');
      await render();scrollTo(0,y);break}
@@ -842,8 +839,8 @@ document.addEventListener('click',async e=>{
    case 'brestore':restore(document.getElementById('restoreText').value);break;
   }
 });
-async function updateHadithHead(){const m=await meta();const list=m.plan[ui.hDay];if(ui.hMode!=='day')return;const r=list.filter(n=>S.hadith[n]).length;
-  const c=document.getElementById('hcount'),b=document.getElementById('hbar');if(c)c.textContent=`${r} of ${list.length}`;if(b)b.style.width=(r/list.length*100)+'%';}
+async function updateHadithHead(){const hs=hadithStatus();if(!hs)return;
+  const c=document.getElementById('hcount'),b=document.getElementById('hbar'),p=document.getElementById('hpill');if(c)c.textContent=`${hs.readToday} of ${hs.target}`;if(b)b.style.width=(hs.target?Math.min(1,hs.readToday/hs.target)*100:0)+'%';if(p)p.innerHTML=statusPill(hs.diff,'hadith');}
 
 /* ---------- boot ---------- */
 const VIEWS={home:viewHome,hadith:viewHadith,quran:viewQuran,salah:viewSalah,adhkar:viewAdhkar,tasbih:viewTasbih,month:viewMonth};
